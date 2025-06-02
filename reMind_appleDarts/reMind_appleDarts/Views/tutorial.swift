@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Model
 struct TutorialPage {
@@ -12,6 +13,7 @@ struct TutorialPage {
 // MARK: - Main View
 struct TutorialView: View {
     @State private var currentPage = 0
+    @State private var showingShareSheet = false
 
     private let pages: [TutorialPage] = [
         .init(imageName: "tut", title: "Set-up your avatar with your loved ones", subtitle: "Just a few simple steps to get started!", buttonTitle: "Next"),
@@ -24,15 +26,20 @@ struct TutorialView: View {
         TutorialStepView(
             page: pages[currentPage],
             currentPage: currentPage,
-            totalPages: pages.count,
-            onNext: {
-                if currentPage < pages.count - 1 {
-                    currentPage += 1
-                } else {
-                    print("Tutorial completed or send request triggered.")
-                }
+            totalPages: pages.count
+        ) {
+            if currentPage < pages.count - 1 {
+                currentPage += 1
+            } else {
+                showingShareSheet = true
             }
-        )
+        }
+        .sheet(isPresented: $showingShareSheet) {
+            ActivityView(activityItems: [
+                URL(string: "https://example.com/invite")!,
+                "Hey! Please join me on this app 💛"
+            ])
+        }
     }
 }
 
@@ -123,6 +130,19 @@ struct TutorialPageIndicator: View {
             }
         }
     }
+}
+
+// MARK: - Share Sheet Wrapper
+struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems,
+                                 applicationActivities: applicationActivities)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Preview
