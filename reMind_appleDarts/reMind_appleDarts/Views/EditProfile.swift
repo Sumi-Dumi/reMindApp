@@ -21,14 +21,15 @@ struct EditProfile: View {
     var body: some View {
         ZStack {
             // Background
-            LinearGradient(gradient: Gradient(colors: [
-                Color.white,
-                Color.primaryGreen.opacity(0.08),
-                Color.pink.opacity(0.05)
-            ]),
-            startPoint: .top,
-            endPoint: .bottom)
-            .ignoresSafeArea()
+//            LinearGradient(gradient: Gradient(colors: [
+//                Color.white,
+//                Color.primaryGreen.opacity(0.08),
+//                Color.pink.opacity(0.05)
+//            ]),
+//            startPoint: .top,
+//            endPoint: .bottom)
+//            .ignoresSafeArea()
+            BackGroundView()
 
             VStack(spacing: 24) {
                 Spacer()
