@@ -1,10 +1,3 @@
-//
-//  PulsingView.swift
-//  reMind_appleDarts
-//
-//  Created by Sumi on 2/6/2025.
-//
-
 import SwiftUI
 
 // ───────────────────────────────────────────
@@ -54,10 +47,10 @@ struct BackgroundBlob: View {
     // Transparent pastel color per layer
     private var color: Color {
         switch id {
-        case 0: return Color(red: 1.0, green: 0.8, blue: 0.9).opacity(0.3)   // pastel pink
-        case 1: return Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.3)   // pastel blue
-        case 2: return Color(red: 0.8, green: 1.0, blue: 0.8).opacity(0.3)   // pastel green
-        default: return Color(red: 0.9, green: 0.8, blue: 1.0).opacity(0.3)  // pastel lavender
+        case 0: return Color(red: 1.0, green: 0.8, blue: 0.9).opacity(0.1)   // pastel pink
+        case 1: return Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.1)   // pastel blue
+        case 2: return Color(red: 0.8, green: 1.0, blue: 0.8).opacity(0.1)   // pastel green
+        default: return Color(red: 0.9, green: 0.8, blue: 1.0).opacity(0.1)  // pastel lavender
         }
     }
 
