@@ -109,7 +109,9 @@ struct PulsingView: View {
 
             ZStack {
                 // 1) White background
-                Color.white.ignoresSafeArea()
+//                Color.white.ignoresSafeArea()
+                // Background
+                BackGroundView()
 
                 // 2) Place blobs+image in a VStack aligned to top
                 VStack {
@@ -176,17 +178,17 @@ struct PulsingView: View {
                             .font(.headline)
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 18)
                             .background(Color.primaryGreen)
-                            .cornerRadius(8)
+                            .cornerRadius(12)
                     }
-                    .padding(.horizontal, 40)
+                    .padding(.horizontal, 80)
                 }
                 // Position this VStack near the bottom half
                 .position(x: geo.size.width / 2, y: geo.size.height * 0.75)
                 .onAppear {
                     animateAffirmation = true
-                    Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+                    Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { _ in
                         currentAffirmation = (currentAffirmation + 1) % affirmations.count
                     }
                 }
