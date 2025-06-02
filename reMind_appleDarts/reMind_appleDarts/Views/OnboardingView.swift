@@ -21,7 +21,7 @@ struct OnboardingView: View {
                 // App name
                 Text("reMind")
                     .font(.system(size: 32, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(.primaryText)
 
                 Spacer()
                 
@@ -36,7 +36,7 @@ struct OnboardingView: View {
                             .padding(.vertical, 18) // ⬅️ Vertical padding only
                             .background(Color.primaryGreen)
                             .cornerRadius(12)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primaryText)
                             .font(.headline)
                     }
 
@@ -53,7 +53,7 @@ struct OnboardingView: View {
                                     .stroke(Color.primaryGreen, lineWidth: 5)
                             )
                             .cornerRadius(12)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primaryText)
                             .font(.headline)
                     }
                 }
