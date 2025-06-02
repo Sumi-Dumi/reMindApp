@@ -68,6 +68,7 @@ struct TutorialStepView: View {
 
             Text(page.title)
                 .font(.title2.bold())
+                .foregroundColor(.primaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
@@ -119,7 +120,7 @@ struct TutorialPageIndicator: View {
                 if index == currentPage {
                     Capsule()
                         .frame(width: 20, height: 8)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primaryText)
                         .animation(.easeInOut(duration: 0.3), value: currentPage)
                 } else {
                     Circle()
