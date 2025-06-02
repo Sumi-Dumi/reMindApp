@@ -110,7 +110,7 @@ struct AvatarCard: View {
             avatarImageName: "custom_avatar",
             name: "Alex",
             tagText: "premium",
-            tagColor: Color(red: 255 / 255, green: 215 / 255, blue: 0 / 255), 
+            tagColor: Color(red: 255 / 255, green: 215 / 255, blue: 0 / 255),
             description: "Japanese / Fast-paced",
             isDefault: false
         ) {

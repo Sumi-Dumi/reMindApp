@@ -39,8 +39,22 @@ struct MainView: View {
                     
 //                    supporter card
                     AvatarCard()
-                    AvatarCard()
-                    AvatarCard()
+                    AvatarCard(
+                        avatarImageName: "sample_avatar",
+                        name: "Maria",
+                        tagText: "", //
+                        description: "Spanish / Medium-paced"
+                    ) {
+                        print("Maria session started!")
+                    }
+                    AvatarCard(
+                        avatarImageName: "sample_avatar",
+                        name: "Maria",
+                        tagText: "", //
+                        description: "Spanish / Medium-paced"
+                    ) {
+                        print("Maria session started!")
+                    }
                     
                 }
                 
