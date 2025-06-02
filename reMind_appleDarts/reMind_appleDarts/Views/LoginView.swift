@@ -13,12 +13,15 @@ struct LoginView: View {
                 Spacer()
 
                 // Title
+                VStack{
+                    
+                }
                 Text("Login")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.black)
 
                 // Subtitle
-                Text("Let’s get you signed in!")
+                Text("Let’s get you logged in!")
                     .font(.subheadline)
                     .foregroundColor(Color.gray)
 

@@ -26,4 +26,6 @@ extension Color {
 
 extension Color {
     static let primaryGreen = Color(hex: "#DCEC7D")
+    static let primaryText = Color(hex: "#414141")
+    static let secondaryText = Color(hex: "#757575")
 }

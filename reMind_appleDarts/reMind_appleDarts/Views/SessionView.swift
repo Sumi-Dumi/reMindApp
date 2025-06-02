@@ -18,15 +18,15 @@ struct SessionView: View {
             Color.gray.ignoresSafeArea()
             
             VideoView()
-
-                    // UI
+            
+            // UI
             VStack {
                 // Progress Bars
                 HStack(spacing: 6) {
                     ForEach(0..<5) { index in
                         Capsule()
                             .frame(height: 4)
-                            .foregroundColor(index < 1 ? .white : .black.opacity(0.3)) // adjust based on progress
+                            .foregroundColor(index < 1 ? .white : .white.opacity(0.3)) // adjust based on progress
                     }
                 }
                 .padding(.top, 20)
@@ -45,55 +45,62 @@ struct SessionView: View {
                     .multilineTextAlignment(.center)
                 Spacer().frame(height: 80)
                 
-                // Button Allignment
-                HStack {
-                    // keyboard
-                    Button(action: {}) {
-                        Image(systemName: "keyboard")
-                            .foregroundColor(.black)
-                            .frame(width: 40, height: 40)
-                            .background(Color.white.opacity(0.2))
-                            .clipShape(Circle())
-                    }
-                    
-                    Spacer()
-                    
-                    // mic
+                ZStack {
+                    // Mic button
                     Button(action: {}) {
                         Image(systemName: "mic.fill")
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                            .frame(width: 50, height: 50)
-                            .background(.black)
-                            .clipShape(Circle())
+                            .padding(.horizontal, 40)
+                            .padding(.vertical, 26.66667)
+                            .frame(width: 100, height: 100)
+                            .background(.white.opacity(0.4))
+                            .cornerRadius(100)
                     }
                     
-                    Spacer()
-                    
-                    HStack{
-                        // close
+                    // Buttons around mic
+                    HStack {
+                        // Left: Keyboard
                         Button(action: {}) {
-                            Image(systemName: "delete.left.fill")
-                                .foregroundColor(.white)
-                                .frame(width: 40, height: 40)
-                        }
-                        
-                        // check
-                        Button(action: {}) {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.black)
+                            Image(systemName: "keyboard")
+                                .resizable()
+                                .scaledToFit()
                                 .frame(width: 28, height: 28)
-                                .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                                .clipShape(Circle())
+                                .foregroundColor(.white.opacity(0.5))
                         }
+                        .padding(.leading, 24) // Adjusted from 12 to 24 for balance
                         
+                        Spacer()
+                        
+                        // Right: Delete + Check
+                        HStack(spacing: 8) {
+                            Button(action: {}) {
+                                Image(systemName: "delete.left.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24, height: 24)
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Button(action: {}) {
+                                Image(systemName: "checkmark")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 12, height: 12)
+                                    .foregroundColor(.black)
+                                    .padding(8)
+                                    .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
+                                    .clipShape(Circle())
+                            }
+                        }
+                        .padding(.trailing, 24) // Adjusted to match left side
                     }
+                    .padding(.horizontal, 40) // Controls overall width and closeness to mic
                 }
-                .padding(.horizontal, 30)
-                .padding(.bottom, 30)
             }
         }
     }
-    
 }
 
 struct SessionView_Previews: PreviewProvider {

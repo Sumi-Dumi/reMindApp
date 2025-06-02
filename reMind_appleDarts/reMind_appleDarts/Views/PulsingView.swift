@@ -109,7 +109,9 @@ struct PulsingView: View {
 
             ZStack {
                 // 1) White background
-                Color.white.ignoresSafeArea()
+//                Color.white.ignoresSafeArea()
+                // Background
+                BackGroundView()
 
                 // 2) Place blobs+image in a VStack aligned to top
                 VStack {
@@ -152,7 +154,7 @@ struct PulsingView: View {
                     Text(affirmations[currentAffirmation])
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primaryText)
                         .opacity(animateAffirmation ? 1 : 0)
                         .offset(y: animateAffirmation ? -20 : 0)
                         .animation(
@@ -163,7 +165,7 @@ struct PulsingView: View {
                     // Prompt text
                     Text("Now, Relax and Breathe with me...")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(.secondaryText)
 
                     // Spacer to give breathing room above the button
                     Spacer().frame(height: 40)
@@ -173,20 +175,22 @@ struct PulsingView: View {
                         // Add your finish action here
                     }) {
                         Text("Finish")
+                            
                             .font(.headline)
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 18)
                             .background(Color.primaryGreen)
-                            .cornerRadius(8)
+                            .cornerRadius(12)
+                            .foregroundColor(.primaryText)
                     }
-                    .padding(.horizontal, 40)
+                    .padding(.horizontal, 80)
                 }
                 // Position this VStack near the bottom half
                 .position(x: geo.size.width / 2, y: geo.size.height * 0.75)
                 .onAppear {
                     animateAffirmation = true
-                    Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+                    Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { _ in
                         currentAffirmation = (currentAffirmation + 1) % affirmations.count
                     }
                 }

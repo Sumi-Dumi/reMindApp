@@ -13,7 +13,7 @@ struct OnboardingView: View {
                 Spacer()
                 
                 // Logo
-                Image("logo")
+                Image("Breath")
                     .resizable()
                     .frame(width: 120, height: 120)
                     .padding(.bottom, 10)
@@ -21,37 +21,43 @@ struct OnboardingView: View {
                 // App name
                 Text("reMind")
                     .font(.system(size: 32, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(.primaryText)
 
                 Spacer()
                 
-                // Login Button
-                Button(action: {
-                    // Login action
-                }) {
-                    Text("Login")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.primaryGreen)
-                        .cornerRadius(15)
-                        .foregroundColor(.black)
-                        .font(.headline)
-                }
-                .padding(.horizontal, 40)
+                // Buttons
+                VStack(spacing: 20) { // ⬅️ Reduced spacing between buttons
+                    // Login Button
+                    Button(action: {
+                        // Login action
+                    }) {
+                        Text("Login")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18) // ⬅️ Vertical padding only
+                            .background(Color.primaryGreen)
+                            .cornerRadius(12)
+                            .foregroundColor(.primaryText)
+                            .font(.headline)
+                    }
 
-                // Signup Button
-                Button(action: {
-                    // Signup action
-                }) {
-                    Text("Signup")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.primaryGreen)
-                        .cornerRadius(15)
-                        .foregroundColor(.black)
-                        .font(.headline)
+                    // Register Button
+                    Button(action: {
+                        // Register action
+                    }) {
+                        Text("Register")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                            .background(Color.white.opacity(0.5))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.primaryGreen, lineWidth: 5)
+                            )
+                            .cornerRadius(12)
+                            .foregroundColor(.primaryText)
+                            .font(.headline)
+                    }
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 80)
 
                 Spacer()
             }
