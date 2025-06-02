@@ -13,7 +13,7 @@ struct OnboardingView: View {
                 Spacer()
                 
                 // Logo
-                Image("logo")
+                Image("Breath")
                     .resizable()
                     .frame(width: 120, height: 120)
                     .padding(.bottom, 10)

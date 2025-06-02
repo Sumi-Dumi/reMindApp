@@ -1,59 +1,57 @@
-//
-//  ContentView.swift
-//  reMind
-//
-//  Created by Ansha on 30/5/2025.
-//
-
 import SwiftUI
 
 struct EndSessionView: View {
     var body: some View {
-        
-        ZStack{
-            BackGroundView()
-            VStack(spacing: 22){
-                Text("✔️")
-                Text("End of Session")
-                    .font(.title)
-                
-                HStack{
-                    ZStack{
-                        Rectangle()
-                            .fill(Color.gray)
-                            .frame(width: 100, height: 30)
-                            .cornerRadius(10)
-                        Button(action: {
-                            // action here
-                        }) {
-                            Text("Finish")
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                        }
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                gradient: Gradient(colors: [Color.white, Color(.systemPink).opacity(0.05)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                // Checkmark
+                Image(systemName: "checkmark")
+                    .font(.system(size: 48, weight: .medium))
+                    .foregroundColor(.gray)
+
+                // Title
+                Text("End of session")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
+
+                // Buttons
+                HStack(spacing: 16) {
+                    // Resume
+                    Button(action: {
+                        // Resume action
+                    }) {
+                        Text("Resume")
+                            .fontWeight(.medium)
+                            .foregroundColor(.black)
+                            .frame(minWidth: 120, minHeight: 44)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(12)
                     }
-                    ZStack{
-                        Rectangle()
-                            .fill(Color.primaryGreen)
-                            .frame(width: 100, height: 30)
-                            .cornerRadius(10)
-                        Button(action: {
-                            // action here
-                        }) {
-                            Text("Resume")
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                        }
+
+                    // Finish
+                    Button(action: {
+                        // Finish action
+                    }) {
+                        Text("Finish")
+                            .fontWeight(.medium)
+                            .foregroundColor(.black)
+                            .frame(minWidth: 120, minHeight: 44)
+                            .background(Color.primaryGreen)
+                            .cornerRadius(12)
                     }
-                    //Button(action: signIn) {
-                    //    Text("Sign In")
-                    // }
-                    
                 }
-            
             }
             .padding()
         }
-        
     }
 }
 
