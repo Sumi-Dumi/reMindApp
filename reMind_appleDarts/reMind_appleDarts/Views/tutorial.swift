@@ -16,7 +16,7 @@ struct TutorialView: View {
     @State private var showingShareSheet = false
 
     private let pages: [TutorialPage] = [
-        .init(imageName: "tut", title: "Set-up your avatar with your loved ones", subtitle: "Just a few simple steps to get started!", buttonTitle: "Next"),
+        .init(imageName: "tut1", title: "Set-up your avatar with your loved ones", subtitle: "Just a few simple steps to get started!", buttonTitle: "Next"),
         .init(imageName: "tut2", title: "reMind Shortcut", subtitle: "Here’s how to access support instantly.", buttonTitle: "Next"),
         .init(imageName: "tut3", title: "5-4-3-2-1 Technique", subtitle: "Learn to ground yourself with ease.", buttonTitle: "Get Started"),
         .init(imageName: nil, title: "Request Consent", subtitle: "Invite your loved one to complete setup", buttonTitle: "Send Request", isFinalPage: true)
