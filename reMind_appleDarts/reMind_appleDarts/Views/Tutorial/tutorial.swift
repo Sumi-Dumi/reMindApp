@@ -1,72 +1,95 @@
 import SwiftUI
 
-struct tutView: View {
+// MARK: - Model
+struct TutorialPage {
+    var imageName: String?
+    var title: String
+    var subtitle: String
+    var buttonTitle: String
+    var isFinalPage: Bool = false
+}
+
+// MARK: - Main View
+struct TutorialView: View {
     @State private var currentPage = 0
+
+    private let pages: [TutorialPage] = [
+        .init(imageName: "tut", title: "Set-up your avatar with your loved ones", subtitle: "Just a few simple steps to get started!", buttonTitle: "Next"),
+        .init(imageName: "tut2", title: "reMind Shortcut", subtitle: "Here’s how to access support instantly.", buttonTitle: "Next"),
+        .init(imageName: "tut3", title: "5-4-3-2-1 Technique", subtitle: "Learn to ground yourself with ease.", buttonTitle: "Get Started"),
+        .init(imageName: nil, title: "Request Consent", subtitle: "Invite your loved one to complete setup", buttonTitle: "Send Request", isFinalPage: true)
+    ]
+
+    var body: some View {
+        TutorialStepView(
+            page: pages[currentPage],
+            currentPage: currentPage,
+            totalPages: pages.count,
+            onNext: {
+                if currentPage < pages.count - 1 {
+                    currentPage += 1
+                } else {
+                    print("Tutorial completed or send request triggered.")
+                }
+            }
+        )
+    }
+}
+
+// MARK: - Step View
+struct TutorialStepView: View {
+    let page: TutorialPage
+    let currentPage: Int
+    let totalPages: Int
+    let onNext: () -> Void
 
     var body: some View {
         VStack(spacing: 24) {
             Spacer()
-            
-            // Image with thin rounded border
-            Image("tut1")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 300, height: 300)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                )
-            
-            // Title
-            Text("Set-up your avatar with your loved ones")
-                .font(.title2.bold())
-                .multilineTextAlignment(.center)
-                .foregroundColor(.black)
-                .padding(.horizontal)
-            
-            // Subtitle
-            Text("Follow these steps for the best experience on this app")
-                .font(.subheadline)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.gray)
-                .padding(.horizontal)
 
-            // Custom page indicator
-            HStack(spacing: 10) {
-                ForEach(0..<4) { index in
-                    if index == currentPage {
-                        Capsule()
-                            .frame(width: 20, height: 8)
-                            .foregroundColor(.black)
-                    } else {
-                        Circle()
-                            .frame(width: 8, height: 8)
-                            .foregroundColor(.gray.opacity(0.5))
-                    }
-                }
+            if let image = page.imageName {
+                Image(image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 300, height: 300)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    )
             }
 
-            // Next Button
-            Button(action: {
-                // next page logic
-                if currentPage < 3 {
-                    currentPage += 1
+            Text(page.title)
+                .font(.title2.bold())
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            Text(page.subtitle)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            TutorialPageIndicator(totalPages: totalPages, currentPage: currentPage)
+
+            Button(action: onNext) {
+                HStack {
+                    Text(page.buttonTitle)
+                    if page.isFinalPage {
+                        Image(systemName: "arrow.right")
+                    }
                 }
-            }) {
-                Text("Next")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.primaryGreen)
-                    .foregroundColor(.black)
-                    .cornerRadius(15)
-                    .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.primaryGreen)
+                .foregroundColor(.black)
+                .cornerRadius(15)
+                .font(.headline)
             }
             .padding(.horizontal, 30)
 
             Spacer()
         }
-        .padding(.top)
         .background(
             LinearGradient(
                 gradient: Gradient(colors: [Color.white, Color(.systemPink).opacity(0.05)]),
@@ -78,6 +101,31 @@ struct tutView: View {
     }
 }
 
+// MARK: - Page Indicator
+struct TutorialPageIndicator: View {
+    let totalPages: Int
+    let currentPage: Int
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ForEach(0..<totalPages, id: \.self) { index in
+                if index == currentPage {
+                    Capsule()
+                        .frame(width: 20, height: 8)
+                        .foregroundColor(.black)
+                        .animation(.easeInOut(duration: 0.3), value: currentPage)
+                } else {
+                    Circle()
+                        .frame(width: 8, height: 8)
+                        .foregroundColor(Color.gray.opacity(0.5))
+                        .animation(.easeInOut(duration: 0.3), value: currentPage)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Preview
 #Preview {
-    tutView()
+    TutorialView()
 }
