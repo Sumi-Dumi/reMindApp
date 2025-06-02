@@ -5,30 +5,35 @@
 //  Created by ryosuke on 2/6/2025.
 //
 
+
 import SwiftUI
 import AVKit
 
+struct CustomVideoPlayerView: UIViewControllerRepresentable {
+    let player: AVPlayer
+
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        controller.player = player
+        controller.showsPlaybackControls = false
+        controller.videoGravity = .resizeAspectFill
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+    }
+}
+
 
 struct VideoView: View {
-    @State var player = AVPlayer(url: Bundle.main.url(forResource: "sample_video",
-                                                      withExtension: "mp4")!)
-    @State var isPlaying: Bool = false
+    @State var player = AVPlayer(url: Bundle.main.url(forResource: "sample_video", withExtension: "mp4")!)
     
     var body: some View {
-        VStack {
-            VideoPlayer(player: player)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .edgesIgnoringSafeArea(.all)
-
-//            Button {
-//                isPlaying ? player.pause() : player.play()
-//                isPlaying.toggle()
-//                player.seek(to: .zero)
-//            } label: {
-//                Image(systemName: isPlaying ? "stop" : "play")
-//                    .padding()
-//            }
-        }
+        CustomVideoPlayerView(player: player)
+            .edgesIgnoringSafeArea(.all)
+            .onAppear {
+                player.play()
+            }
     }
 }
 
