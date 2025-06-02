@@ -26,7 +26,7 @@ struct OnboardingView: View {
                 Spacer()
                 
                 // Buttons
-                VStack(spacing: 12) { // ⬅️ Reduced spacing between buttons
+                VStack(spacing: 20) { // ⬅️ Reduced spacing between buttons
                     // Login Button
                     Button(action: {
                         // Login action
@@ -57,7 +57,7 @@ struct OnboardingView: View {
                             .font(.headline)
                     }
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 80)
 
                 Spacer()
             }

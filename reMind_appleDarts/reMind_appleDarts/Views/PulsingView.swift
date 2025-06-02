@@ -165,7 +165,7 @@ struct PulsingView: View {
                     // Prompt text
                     Text("Now, Relax and Breathe with me...")
                         .font(.headline)
-                        .foregroundColor(.primaryText)
+                        .foregroundColor(.secondaryText)
 
                     // Spacer to give breathing room above the button
                     Spacer().frame(height: 40)
