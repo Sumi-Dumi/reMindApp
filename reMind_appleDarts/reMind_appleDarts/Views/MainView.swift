@@ -15,21 +15,7 @@ struct MainView: View {
             
             VStack{
                 //User card
-                HStack{
-                    Image("sample_avatar")
-                        .resizable()
-                        .frame(width: 100, height: 100)
-                        .cornerRadius(100)
-                        .padding()
-                    VStack(alignment: .leading){
-                        Text("Welcome, User!")
-                            .font(.title)
-                        Text("Feel grounded with your loved one")
-                            .font(.caption)
-                            .foregroundColor(Color.gray)
-                    }
-                    
-                }
+                UserCard()
                 
                 HStack{
 //                    Spacer(10)
