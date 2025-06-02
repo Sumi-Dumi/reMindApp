@@ -19,7 +19,6 @@ struct SessionView: View {
             
             VideoView()
 
-
                     // UI
             VStack {
                 // Progress Bars
@@ -95,11 +94,6 @@ struct SessionView: View {
         }
     }
     
-    // sample video URL
-    private var videoURL: URL {
-        //video place
-        Bundle.main.url(forResource: "sample_video", withExtension: "mp4")!
-    }
 }
 
 struct SessionView_Previews: PreviewProvider {
