@@ -15,11 +15,11 @@ struct MainView: View {
             
             VStack{
                 //User card
-                UserCard()
+                UserCard(welcomeText: "Welcome User!",
+                        descriptionText: "Feel grounded with your loved one",
+                        avatarImageName: "sample_avatar")
                 
                 HStack{
-//                    Spacer(10)
-                    
                     Text("Your support circle")
                         .font(.headline)
                     Spacer()
@@ -27,8 +27,6 @@ struct MainView: View {
                         Text("Add more +")
                             .font(.caption)
                     }
-//                    Spacer(10)
-                    
                 }
                 
             }
