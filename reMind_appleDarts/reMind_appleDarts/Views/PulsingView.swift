@@ -198,6 +198,5 @@ struct PulsingView: View {
 struct PulsingView_Previews: PreviewProvider {
     static var previews: some View {
         PulsingView()
-            .previewDevice("iPhone 14 Pro")
     }
 }
