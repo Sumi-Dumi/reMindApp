@@ -16,9 +16,10 @@ struct SessionView: View {
     var body: some View {
         ZStack {
             Color.gray.ignoresSafeArea()
+            
+            VideoView()
 
-//            VideoPlayer(player: AVPlayer(url: videoURL))
-//                .ignoresSafeArea()
+
                     // UI
             VStack {
                 // Progress Bars
