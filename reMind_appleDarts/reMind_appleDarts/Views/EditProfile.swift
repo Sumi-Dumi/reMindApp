@@ -21,6 +21,7 @@ struct EditProfile: View {
     var body: some View {
         ZStack {
             // Background
+
             BackGroundView()
 
             VStack(spacing: 24) {
