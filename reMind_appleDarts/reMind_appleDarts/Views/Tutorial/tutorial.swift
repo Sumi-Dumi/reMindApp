@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct tut1View: View {
+struct tutView: View {
     @State private var currentPage = 0
 
     var body: some View {
@@ -79,5 +79,5 @@ struct tut1View: View {
 }
 
 #Preview {
-    tut1View()
+    tutView()
 }
