@@ -154,7 +154,7 @@ struct PulsingView: View {
                     Text(affirmations[currentAffirmation])
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primaryText)
                         .opacity(animateAffirmation ? 1 : 0)
                         .offset(y: animateAffirmation ? -20 : 0)
                         .animation(
@@ -165,7 +165,7 @@ struct PulsingView: View {
                     // Prompt text
                     Text("Now, Relax and Breathe with me...")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primaryText)
 
                     // Spacer to give breathing room above the button
                     Spacer().frame(height: 40)
@@ -175,12 +175,14 @@ struct PulsingView: View {
                         // Add your finish action here
                     }) {
                         Text("Finish")
+                            
                             .font(.headline)
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 18)
                             .background(Color.primaryGreen)
                             .cornerRadius(12)
+                            .foregroundColor(.primaryText)
                     }
                     .padding(.horizontal, 80)
                 }
