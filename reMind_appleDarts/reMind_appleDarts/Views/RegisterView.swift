@@ -1,12 +1,8 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @State private var name = ""
-    @State private var email = ""
-    @State private var password = ""
     @State private var isRegistered = false
-
-    @AppStorage("userName") private var storedName = ""
+    @State private var dummyText = "" // 실제 사용하지 않음
 
     var body: some View {
         NavigationStack {
@@ -24,45 +20,34 @@ struct RegisterView: View {
                         .font(.subheadline)
                         .foregroundColor(.gray)
 
+                    // Dummy Input UI (not actually used)
                     VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading) {
-                            Text("Name")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            TextField("Name", text: $name)
+                        ForEach(["Name", "Email", "Password"], id: \.self) { label in
+                            VStack(alignment: .leading) {
+                                Text(label)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                Group {
+                                    if label == "Password" {
+                                        SecureField(label, text: $dummyText)
+                                    } else {
+                                        TextField(label, text: $dummyText)
+                                    }
+                                }
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(8)
                                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
-                        }
-
-                        VStack(alignment: .leading) {
-                            Text("Email")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            TextField("Email", text: $email)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
-                        }
-
-                        VStack(alignment: .leading) {
-                            Text("Password")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            SecureField("Password", text: $password)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
+                            }
                         }
                     }
                     .padding(.horizontal, 30)
 
                     Spacer()
 
-                    Button(action: registerUser) {
+                    Button(action: {
+                        isRegistered = true
+                    }) {
                         Text("Register")
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 18)
@@ -75,17 +60,11 @@ struct RegisterView: View {
 
                     Spacer()
                 }
-
                 .navigationDestination(isPresented: $isRegistered) {
-                    MainView()
+                    TutorialView()
                 }
             }
         }
-    }
-
-    func registerUser() {
-        storedName = name  
-        isRegistered = true
     }
 }
 

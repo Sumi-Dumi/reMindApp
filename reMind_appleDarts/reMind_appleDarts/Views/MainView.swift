@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @AppStorage("userName") private var userName: String = "User"
+    let userName = "Sera"
 
     var body: some View {
         ZStack {
