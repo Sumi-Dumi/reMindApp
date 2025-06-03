@@ -1,23 +1,16 @@
 import Foundation
 
 class MainViewModel: ObservableObject {
-    @Published var currentUser: User? = nil
-
-    var isLoggedIn: Bool {
-        currentUser != nil
-    }
-
-    init() {
-        currentUser = UserManager.shared.loadUser()
-    }
+    @Published var currentUser: User?
+    @Published var isLoggedIn: Bool = false
 
     func login(with user: User) {
-        currentUser = user
-        UserManager.shared.saveUser(user)
+        self.currentUser = user
+        self.isLoggedIn = true
     }
 
     func logout() {
-        currentUser = nil
-        UserManager.shared.clearUser()
+        self.currentUser = nil
+        self.isLoggedIn = false
     }
 }
