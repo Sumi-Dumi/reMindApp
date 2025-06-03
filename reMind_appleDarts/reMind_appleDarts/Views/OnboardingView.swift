@@ -1,9 +1,27 @@
 import SwiftUI
 
+enum AuthFlow {
+    case onboarding
+    case login
+    case register
+}
+
 struct OnboardingView: View {
+    @State private var flow: AuthFlow = .onboarding
+
     var body: some View {
+        switch flow {
+        case .onboarding:
+            onboardingContent
+        case .login:
+            LoginView()
+        case .register:
+            RegisterView()
+        }
+    }
+
+    var onboardingContent: some View {
         ZStack {
-            // Background gradient (very light, matching mockup)
             LinearGradient(gradient: Gradient(colors: [Color.white, Color(.systemPink).opacity(0.05)]),
                            startPoint: .top,
                            endPoint: .bottom)
@@ -11,38 +29,33 @@ struct OnboardingView: View {
 
             VStack(spacing: 30) {
                 Spacer()
-                
-                // Logo
+
                 Image("Breath")
                     .resizable()
                     .frame(width: 120, height: 120)
                     .padding(.bottom, 10)
-                
-                // App name
+
                 Text("reMind")
                     .font(.system(size: 32, weight: .medium))
                     .foregroundColor(.primaryText)
 
                 Spacer()
-                
-                // Buttons
-                VStack(spacing: 20) { // ⬅️ Reduced spacing between buttons
-                    // Login Button
+
+                VStack(spacing: 20) {
                     Button(action: {
-                        // Login action
+                        flow = .login
                     }) {
                         Text("Login")
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 18) // ⬅️ Vertical padding only
+                            .padding(.vertical, 18)
                             .background(Color.primaryGreen)
                             .cornerRadius(12)
                             .foregroundColor(.primaryText)
                             .font(.headline)
                     }
 
-                    // Register Button
                     Button(action: {
-                        // Register action
+                        flow = .register
                     }) {
                         Text("Register")
                             .frame(maxWidth: .infinity)
@@ -67,4 +80,5 @@ struct OnboardingView: View {
 
 #Preview {
     OnboardingView()
+        .environmentObject(MainViewModel())
 }
