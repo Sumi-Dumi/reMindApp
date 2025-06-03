@@ -1,27 +1,21 @@
-//
-//  MainView.swift
-//  reMind_appleDarts
-//
-//  Created by ryosuke on 2/6/2025.
-//
-
 import SwiftUI
 
 struct MainView: View {
+    @AppStorage("userName") private var userName: String = "User"
+
     var body: some View {
-        ZStack{
-//            background
+        ZStack {
             BackGroundView()
-            
+
             NavigationView {
-                
-                VStack(spacing:15){
-                    //User card
-                    UserCard(welcomeText: "Welcome User!",
-                            descriptionText: "Feel grounded with your loved one",
-                            avatarImageName: "sample_avatar")
+                VStack(spacing: 15) {
                     
-    //                add button and heading of List
+                    UserCard(
+                        welcomeText: "Welcome \(userName)!",
+                        descriptionText: "Feel grounded with your loved one",
+                        avatarImageName: "sample_avatar"
+                    )
+
                     HStack {
                         Text("Your support circle")
                             .font(.headline)
@@ -33,18 +27,13 @@ struct MainView: View {
                         }
                     }
                     .padding()
-                    
-                    
-                    
-    //                List for supporter
-                    VStack{
-                        
-    //                    supporter card
+
+                    VStack {
                         AvatarCard()
                         AvatarCard(
                             avatarImageName: "sample_avatar",
                             name: "Maria",
-                            tagText: "", //
+                            tagText: "",
                             description: "Spanish / Medium-paced"
                         ) {
                             print("Maria session started!")
@@ -52,22 +41,16 @@ struct MainView: View {
                         AvatarCard(
                             avatarImageName: "sample_avatar",
                             name: "Maria",
-                            tagText: "", //
+                            tagText: "",
                             description: "Spanish / Medium-paced"
                         ) {
                             print("Maria session started!")
                         }
-                        
                     }
-                    
-                    
-                    
+
                     Spacer()
                 }
-                
             }
-            
-            
         }
     }
 }
@@ -75,6 +58,3 @@ struct MainView: View {
 #Preview {
     MainView()
 }
-
-
-

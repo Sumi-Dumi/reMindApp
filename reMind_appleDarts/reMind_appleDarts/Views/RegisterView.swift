@@ -6,6 +6,8 @@ struct RegisterView: View {
     @State private var password = ""
     @State private var isRegistered = false
 
+    @AppStorage("userName") private var storedName = ""
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -82,7 +84,7 @@ struct RegisterView: View {
     }
 
     func registerUser() {
-
+        storedName = name  
         isRegistered = true
     }
 }
