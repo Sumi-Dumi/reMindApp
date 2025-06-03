@@ -34,16 +34,6 @@ struct MainView: View {
                         Spacer()
                         
                         HStack(spacing: 12) {
-                            // Manage avatars button
-                            if viewModel.hasAvatars {
-                                Button(action: {
-                                    showingAvatarList = true
-                                }) {
-                                    Text("Manage")
-                                        .font(.caption)
-                                        .foregroundColor(.blue)
-                                }
-                            }
                             
                             // Add avatar button
                             Button(action: {
@@ -111,10 +101,6 @@ struct MainView: View {
         }
         .sheet(isPresented: $showingCreateAvatar) {
             CreateAvatarView()
-                .environmentObject(viewModel)
-        }
-        .sheet(isPresented: $showingAvatarList) {
-            AvatarListView()
                 .environmentObject(viewModel)
         }
         .onAppear {
