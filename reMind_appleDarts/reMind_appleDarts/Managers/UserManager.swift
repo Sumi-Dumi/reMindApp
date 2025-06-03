@@ -7,7 +7,6 @@ class UserManager {
 
     func saveUser(_ user: User) {
         let correctedUser = enforceSingleDefaultAvatar(user)
-
         if let data = try? JSONEncoder().encode(correctedUser) {
             UserDefaults.standard.set(data, forKey: userKey)
         }
