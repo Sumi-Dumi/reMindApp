@@ -18,7 +18,7 @@ struct RegisterView: View {
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.black)
 
-                Text("Enter your details to proceed further")
+                Text("Let’s get you started")
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
@@ -63,7 +63,7 @@ struct RegisterView: View {
                 Button(action: registerUser) {
                     Text("Register")
                         .frame(maxWidth: .infinity)
-                        .padding()
+                        .padding(.vertical, 18)
                         .background(Color.primaryGreen)
                         .foregroundColor(.black)
                         .cornerRadius(15)
@@ -88,7 +88,6 @@ struct RegisterView: View {
         viewModel.login(with: newUser)
     }
 }
-
 
 #Preview {
     RegisterView()
