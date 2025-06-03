@@ -1,21 +1,19 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @State private var firstName = ""
-    @State private var lastName = ""
+    @EnvironmentObject var viewModel: MainViewModel
+
+    @State private var name = ""
     @State private var email = ""
     @State private var password = ""
 
     var body: some View {
         ZStack {
-            // Background
             BackGroundView()
-
 
             VStack(spacing: 24) {
                 Spacer()
 
-                // Title and subtitle
                 Text("Register")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.black)
@@ -24,54 +22,29 @@ struct RegisterView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                // Input Fields
                 VStack(alignment: .leading, spacing: 16) {
-                    // First & Last name
-                    HStack(spacing: 16) {
-                        VStack(alignment: .leading) {
-                            Text("First name")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            TextField("First name", text: $firstName)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray.opacity(0.3))
-                                )
-                        }
-                        VStack(alignment: .leading) {
-                            Text("Last name")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            TextField("Last name", text: $lastName)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray.opacity(0.3))
-                                )
-                        }
+                    VStack(alignment: .leading) {
+                        Text("Name")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        TextField("Name", text: $name)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
                     }
 
-                    // Email
                     VStack(alignment: .leading) {
                         Text("Email")
                             .font(.subheadline)
                             .foregroundColor(.gray)
-                        TextField("remind@wegotyou.com", text: $email)
+                        TextField("Email", text: $email)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.3))
-                            )
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
                     }
 
-                    // Password
                     VStack(alignment: .leading) {
                         Text("Password")
                             .font(.subheadline)
@@ -80,20 +53,14 @@ struct RegisterView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.3))
-                            )
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
                     }
                 }
                 .padding(.horizontal, 30)
 
                 Spacer()
 
-                // Register Button
-                Button(action: {
-                    // Register action
-                }) {
+                Button(action: registerUser) {
                     Text("Register")
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -108,7 +75,20 @@ struct RegisterView: View {
             }
         }
     }
+
+    func registerUser() {
+        let newUser = User(
+            id: Int.random(in: 1000...9999),
+            name: name,
+            email: email,
+            password: password,
+            profileImg: "defaultProfile.png",
+            avatars: []
+        )
+        viewModel.login(with: newUser)
+    }
 }
+
 
 #Preview {
     RegisterView()
