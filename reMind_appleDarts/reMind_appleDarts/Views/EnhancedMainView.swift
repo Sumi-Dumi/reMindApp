@@ -78,39 +78,6 @@ struct EnhancedMainView: View {
                                     }
                                 }
                                 
-                                // Add more avatars prompt if less than 5
-                                if viewModel.avatarCount < 5 {
-                                    Button(action: {
-                                        showingCreateAvatar = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "plus.circle.dashed")
-                                                .font(.title2)
-                                                .foregroundColor(.gray)
-                                            
-                                            VStack(alignment: .leading) {
-                                                Text("Add another companion")
-                                                    .font(.headline)
-                                                    .foregroundColor(.primaryText)
-                                                
-                                                Text("Create up to 5 support avatars")
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                            }
-                                            
-                                            Spacer()
-                                        }
-                                        .padding()
-                                        .background(Color.white.opacity(0.6))
-                                        .cornerRadius(12)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                        )
-                                    }
-                                    .padding(.horizontal, 20)
-                                }
-                                
                             } else {
                                 // Empty state with call to action
                                 VStack(spacing: 20) {
@@ -131,34 +98,9 @@ struct EnhancedMainView: View {
                                             .padding(.horizontal, 20)
                                     }
                                     
-                                    Button(action: {
-                                        showingCreateAvatar = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "plus.circle.fill")
-                                            Text("Create Your First Avatar")
-                                        }
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 16)
-                                        .background(Color.primaryGreen)
-                                        .cornerRadius(12)
-                                    }
-                                    .padding(.horizontal, 40)
                                     
-                                    // Demo button for testing
-                                    Button(action: {
-                                        viewModel.createDemoAvatars()
-                                    }) {
-                                        Text("Load Demo Avatars")
-                                            .font(.caption)
-                                            .foregroundColor(.blue)
-                                            .underline()
-                                    }
-                                    .padding(.top, 10)
                                 }
-                                .padding(.top, 40)
+
                             }
                         }
                     }
