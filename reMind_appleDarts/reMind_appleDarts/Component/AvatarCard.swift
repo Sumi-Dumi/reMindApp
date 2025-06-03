@@ -81,18 +81,19 @@ struct AvatarCard: View {
                 
                 Spacer()
                 
-                // start session button
-                ZStack{
-                    Rectangle()
-                        .foregroundColor(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                        .frame(width: 90, height: 40)
-                        .cornerRadius(10)
-                    Button(action: onStartSession){
+                //  // start session button
+                NavigationLink(destination: SessionView()) {
+                    ZStack{
+                        Rectangle()
+                            .foregroundColor(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
+                            .frame(width: 90, height: 40)
+                            .cornerRadius(10)
                         Text("start session")
                             .font(.caption)
                             .foregroundColor(.black)
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(.horizontal, 20)
         }
@@ -109,10 +110,7 @@ struct AvatarCard: View {
         AvatarCard(
             avatarImageName: "custom_avatar",
             name: "Alex",
-            tagText: "premium",
-            tagColor: Color(red: 255 / 255, green: 215 / 255, blue: 0 / 255),
-            description: "Japanese / Fast-paced",
-            isDefault: false
+            description: "English / Fast-paced",
         ) {
             print("Alex session started!")
         }
