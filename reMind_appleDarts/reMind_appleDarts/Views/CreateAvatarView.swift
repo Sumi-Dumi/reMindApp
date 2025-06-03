@@ -1,14 +1,7 @@
-//
-//  CreateAvatarView.swift
-//  reMind_appleDarts
-//
-//  Created by ryosuke on 3/6/2025.
-//
-
 import SwiftUI
 
 struct CreateAvatarView: View {
-    @EnvironmentObject var viewModel: MainViewModel
+    @EnvironmentObject var appViewModel: AppViewModel
     @Environment(\.presentationMode) var presentationMode
     
     @State private var avatarName = ""
@@ -19,7 +12,10 @@ struct CreateAvatarView: View {
     @State private var isDefault = false
     @State private var showingImagePicker = false
     @State private var showSuccessAlert = false
-    @State private var isCreating = false // Add loading state
+    @State private var isCreating = false
+    @State private var validationMessage = ""
+    
+    var onAvatarCreated: (() -> Void)? = nil
     
     private let languages = ["English", "Japanese", "Spanish", "French", "German", "Italian"]
     private let themes = ["Calm", "Energetic", "Peaceful", "Motivational", "Relaxing", "Cheerful"]
@@ -28,264 +24,303 @@ struct CreateAvatarView: View {
     
     // Computed property to check if form is valid
     private var isFormValid: Bool {
-        !avatarName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName)
+        return validation.isValid
     }
     
     var body: some View {
-        ZStack {
-            // Background
-            BackGroundView()
-            
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 8) {
-                        Text("Create New Avatar")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.primaryText)
+        NavigationView {
+            ZStack {
+                // Background
+                BackGroundView()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Header
+                        headerSection
                         
-                        Text("Design your personal support companion")
-                            .font(.subheadline)
-                            .foregroundColor(.secondaryText)
-                    }
-                    .padding(.top, 20)
-                    
-                    
-                    // Form Fields
-                    VStack(spacing: 20) {
-                        // Avatar Name
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Avatar Name")
-                                .font(.subheadline)
-                                .foregroundColor(.secondaryText)
-                            
-                            TextField("Enter avatar name", text: $avatarName)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.gray.opacity(0.3))
-                                )
-                        }
-                        
-                        // Language Selection
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Language")
-                                .font(.subheadline)
-                                .foregroundColor(.secondaryText)
-                            
-                            Menu {
-                                ForEach(languages, id: \.self) { language in
-                                    Button(action: {
-                                        selectedLanguage = language
-                                    }) {
-                                        HStack {
-                                            Text(language)
-                                            if selectedLanguage == language {
-                                                Spacer()
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(selectedLanguage)
-                                        .foregroundColor(.black)
-                                    Spacer()
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(.gray)
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.gray.opacity(0.3))
-                                )
-                            }
-                        }
-                        
-                        // Theme Selection
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Theme")
-                                .font(.subheadline)
-                                .foregroundColor(.secondaryText)
-                            
-                            Menu {
-                                ForEach(themes, id: \.self) { theme in
-                                    Button(action: {
-                                        selectedTheme = theme
-                                    }) {
-                                        HStack {
-                                            Text(theme)
-                                            if selectedTheme == theme {
-                                                Spacer()
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(selectedTheme)
-                                        .foregroundColor(.black)
-                                    Spacer()
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(.gray)
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.gray.opacity(0.3))
-                                )
-                            }
-                        }
-                        
-                        // Voice Tone Selection
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Voice Tone")
-                                .font(.subheadline)
-                                .foregroundColor(.secondaryText)
-                            
-                            Menu {
-                                ForEach(voiceTones, id: \.self) { tone in
-                                    Button(action: {
-                                        selectedVoiceTone = tone
-                                    }) {
-                                        HStack {
-                                            Text(tone)
-                                            if selectedVoiceTone == tone {
-                                                Spacer()
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(selectedVoiceTone)
-                                        .foregroundColor(.black)
-                                    Spacer()
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(.gray)
-                                }
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.gray.opacity(0.3))
-                                )
-                            }
-                        }
+                        // Form Fields
+                        formFieldsSection
                         
                         // Default Avatar Toggle
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("Set as Default Avatar")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondaryText)
-                                
-                                Text("This avatar will be your primary companion")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            Spacer()
-                            
-                            Toggle("", isOn: $isDefault)
-                                .toggleStyle(SwitchToggleStyle(tint: .primaryGreen))
-                        }
-                        .padding()
-                        .background(Color.white.opacity(0.7))
-                        .cornerRadius(12)
-                    }
-                    .padding(.horizontal, 30)
-                    
-                    // Action Buttons
-                    VStack(spacing: 16) {
-                        // Debug info (remove in production)
-                        Text("Form Valid: \(isFormValid ? "Yes" : "No")")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        defaultToggleSection
                         
-                        HStack(spacing: 16) {
-                            // Cancel Button
-                            Button(action: {
-                                print("Cancel button pressed")
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Text("Cancel")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .background(Color.gray.opacity(0.3))
-                                    .foregroundColor(.black)
-                                    .cornerRadius(12)
-                                    .font(.headline)
-                            }
-                            
-                            // Create Button
-                            Button(action: {
-                                print("Create button pressed")
-                                print("Avatar name: '\(avatarName)'")
-                                print("Is form valid: \(isFormValid)")
-                                createAvatar()
-                            }) {
-                                HStack {
-                                    if isCreating {
-                                        ProgressView()
-                                            .scaleEffect(0.8)
-                                            .foregroundColor(.black)
-                                    }
-                                    Text(isCreating ? "Creating..." : "Create Avatar")
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(
-                                    (!isFormValid || isCreating) ?
-                                    Color.gray.opacity(0.5) :
-                                    Color.primaryGreen
-                                )
-                                .foregroundColor(.black)
-                                .cornerRadius(12)
-                                .font(.headline)
-                            }
-                            .disabled(!isFormValid || isCreating)
+                        // Validation Message
+                        if !validationMessage.isEmpty {
+                            Text(validationMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.horizontal, 30)
                         }
+                        
+                        // Action Buttons
+                        actionButtonsSection
                     }
-                    .padding(.horizontal, 30)
-                    .padding(.bottom, 30)
                 }
             }
         }
         .navigationBarHidden(true)
         .alert("Avatar Created!", isPresented: $showSuccessAlert) {
             Button("OK") {
-                presentationMode.wrappedValue.dismiss()
+                onAvatarCreated?()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    presentationMode.wrappedValue.dismiss()
+                }
             }
         } message: {
             Text("Your new avatar '\(avatarName)' has been created successfully!")
         }
+        .onChange(of: avatarName) { _ in
+            validateForm()
+        }
+        .onAppear {
+            // Set as default if this is the first avatar
+            isDefault = !appViewModel.hasAvatars
+        }
+    }
+    
+    // MARK: - Header Section
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            Text("Create New Avatar")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(.primaryText)
+            
+            Text("Design your personal support companion")
+                .font(.subheadline)
+                .foregroundColor(.secondaryText)
+        }
+        .padding(.top, 20)
+    }
+    
+    // MARK: - Form Fields Section
+    private var formFieldsSection: some View {
+        VStack(spacing: 20) {
+            // Avatar Name
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Avatar Name")
+                        .font(.subheadline)
+                        .foregroundColor(.secondaryText)
+                    
+                    Spacer()
+                    
+                    Text("\(avatarName.count)/30")
+                        .font(.caption2)
+                        .foregroundColor(avatarName.count > 25 ? .orange : .gray)
+                }
+                
+                TextField("Enter avatar name", text: $avatarName)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(
+                                !isFormValid && !avatarName.isEmpty ? Color.red : Color.gray.opacity(0.3),
+                                lineWidth: !isFormValid && !avatarName.isEmpty ? 2 : 1
+                            )
+                    )
+            }
+            
+            // Language Selection
+            selectionField(
+                title: "Language",
+                selectedValue: selectedLanguage,
+                options: languages,
+                icon: "globe"
+            ) { language in
+                selectedLanguage = language
+            }
+            
+            // Theme Selection
+            selectionField(
+                title: "Theme",
+                selectedValue: selectedTheme,
+                options: themes,
+                icon: "paintpalette"
+            ) { theme in
+                selectedTheme = theme
+            }
+            
+            // Voice Tone Selection
+            selectionField(
+                title: "Voice Tone",
+                selectedValue: selectedVoiceTone,
+                options: voiceTones,
+                icon: "speaker.wave.2"
+            ) { voiceTone in
+                selectedVoiceTone = voiceTone
+            }
+        }
+        .padding(.horizontal, 30)
+    }
+    
+    // MARK: - Default Toggle Section
+    private var defaultToggleSection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Default Avatar")
+                        .font(.subheadline)
+                        .foregroundColor(.secondaryText)
+                    
+                    Text(isDefault ?
+                         "This will be your primary companion" :
+                         "Set as your primary companion")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: $isDefault)
+                    .toggleStyle(SwitchToggleStyle(tint: .primaryGreen))
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isDefault ? Color.primaryGreen.opacity(0.1) : Color.white.opacity(0.7))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isDefault ? Color.primaryGreen.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
+            )
+            
+            if !appViewModel.hasAvatars {
+                Text("💡 This will be your first avatar and will be set as default")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 8)
+            }
+        }
+        .padding(.horizontal, 30)
+    }
+    
+    // MARK: - Action Buttons Section
+    private var actionButtonsSection: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 16) {
+                // Cancel Button
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Cancel")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.gray.opacity(0.3))
+                        .foregroundColor(.black)
+                        .cornerRadius(12)
+                        .font(.headline)
+                }
+                
+                // Create Button
+                Button(action: createAvatar) {
+                    HStack {
+                        if isCreating {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                                .foregroundColor(.black)
+                        }
+                        Text(isCreating ? "Creating..." : "Create Avatar")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        (!isFormValid || isCreating) ?
+                        Color.gray.opacity(0.5) :
+                        Color.primaryGreen
+                    )
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+                    .font(.headline)
+                }
+                .disabled(!isFormValid || isCreating)
+            }
+        }
+        .padding(.horizontal, 30)
+        .padding(.bottom, 30)
+    }
+    
+    // MARK: - Helper Views
+    private func selectionField(
+        title: String,
+        selectedValue: String,
+        options: [String],
+        icon: String,
+        onSelection: @escaping (String) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.subheadline)
+                .foregroundColor(.secondaryText)
+            
+            Menu {
+                ForEach(options, id: \.self) { option in
+                    Button(action: {
+                        onSelection(option)
+                    }) {
+                        HStack {
+                            Text(option)
+                            if selectedValue == option {
+                                Spacer()
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.primaryText)
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundColor(.gray)
+                        .frame(width: 20)
+                    
+                    Text(selectedValue)
+                        .foregroundColor(.black)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3))
+                )
+            }
+        }
+    }
+    
+    // MARK: - Functions
+    private func validateForm() {
+        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName)
+        validationMessage = validation.isValid ? "" : validation.message
     }
     
     private func createAvatar() {
-        print("createAvatar() function called")
+        // Validate form one more time
+        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines))
+        
+        if !validation.isValid {
+            validationMessage = validation.message
+            return
+        }
         
         // Set loading state
         isCreating = true
         
         // Add a small delay to show loading state
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            
             // Create new avatar
             let newAvatar = Avatar(
                 id: Int.random(in: 10000...99999),
                 name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines),
-                isDefault: isDefault,
+                isDefault: isDefault || !appViewModel.hasAvatars, // Set as default if first avatar
                 language: selectedLanguage,
                 theme: selectedTheme,
                 voiceTone: selectedVoiceTone,
@@ -293,51 +328,12 @@ struct CreateAvatarView: View {
                 deepfakeReady: false
             )
             
-            print("New avatar created: \(newAvatar)")
+            appViewModel.avatarManager.addAvatar(newAvatar)
             
-            // If no current user exists, create a dummy user
-            var currentUser = viewModel.currentUser
-            if currentUser == nil {
-                print("No current user found, creating dummy user")
-                currentUser = User(
-                    id: Int.random(in: 1000...9999),
-                    name: "User",
-                    email: "user@example.com",
-                    password: "",
-                    profileImg: "sample_avatar",
-                    avatars: []
-                )
-                viewModel.currentUser = currentUser
-                viewModel.isLoggedIn = true
-            }
+
+            appViewModel.objectWillChange.send()
             
-            guard var user = currentUser else {
-                print("Failed to create/get user")
-                isCreating = false
-                return
-            }
-            
-            print("Working with user: \(user.name)")
-            
-            // If this is set as default, make sure no other avatar is default
-            if isDefault {
-                user.avatars = user.avatars.map { avatar in
-                    var updatedAvatar = avatar
-                    updatedAvatar.isDefault = false
-                    return updatedAvatar
-                }
-            }
-            
-            // Add new avatar
-            user.avatars.append(newAvatar)
-            
-            print("User updated with \(user.avatars.count) avatars")
-            
-            // Update user in UserManager and ViewModel
-            UserManager.shared.saveUser(user)
-            viewModel.currentUser = user
-            
-            print("User saved and viewModel updated")
+            print("✅ Avatar created: \(newAvatar.name), Total avatars: \(appViewModel.avatarManager.avatars.count)")
             
             // Reset loading state
             isCreating = false
@@ -348,27 +344,7 @@ struct CreateAvatarView: View {
     }
 }
 
-// Extension to make MainViewModel work properly if not already implemented
-extension MainViewModel {
-    func addAvatar(_ avatar: Avatar) {
-        guard var user = currentUser else { return }
-        
-        // If this avatar is set as default, remove default status from other avatars
-        if avatar.isDefault {
-            user.avatars = user.avatars.map { existingAvatar in
-                var updatedAvatar = existingAvatar
-                updatedAvatar.isDefault = false
-                return updatedAvatar
-            }
-        }
-        
-        user.avatars.append(avatar)
-        UserManager.shared.saveUser(user)
-        self.currentUser = user
-    }
-}
-
 #Preview {
     CreateAvatarView()
-        .environmentObject(MainViewModel())
+        .environmentObject(AppViewModel())
 }

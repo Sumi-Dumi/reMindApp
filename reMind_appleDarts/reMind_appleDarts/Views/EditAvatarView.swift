@@ -4,11 +4,10 @@
 //
 //  Created by ryosuke on 3/6/2025.
 //
-
 import SwiftUI
 
 struct EditAvatarView: View {
-    @EnvironmentObject var viewModel: EnhancedMainViewModel
+    @EnvironmentObject var appViewModel: AppViewModel
     @Environment(\.presentationMode) var presentationMode
     
     let originalAvatar: Avatar
@@ -52,8 +51,8 @@ struct EditAvatarView: View {
     
     // Form validation
     private var isFormValid: Bool {
-        let trimmedName = avatarName.trimmingCharacters(in: .whitespacesAndNewlines)
-        return !trimmedName.isEmpty && trimmedName.count <= 30
+        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
+        return validation.isValid
     }
     
     var body: some View {
@@ -66,7 +65,6 @@ struct EditAvatarView: View {
                     VStack(spacing: 24) {
                         // Header
                         headerSection
-                        
                         
                         // Form Fields
                         formFieldsSection
@@ -112,7 +110,6 @@ struct EditAvatarView: View {
     // MARK: - Header Section
     private var headerSection: some View {
         VStack(spacing: 16) {
-            
             // Title
             VStack(spacing: 8) {
                 Text("Edit Avatar")
@@ -125,7 +122,6 @@ struct EditAvatarView: View {
             }
         }
     }
-    
     
     // MARK: - Form Fields Section
     private var formFieldsSection: some View {
@@ -221,7 +217,7 @@ struct EditAvatarView: View {
                     .stroke(isDefault ? Color.primaryGreen.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
             )
             
-            if originalAvatar.isDefault && !isDefault {
+            if originalAvatar.isDefault && !isDefault && appViewModel.avatarCount > 1 {
                 Text("⚠️ Removing default status will make another avatar the default")
                     .font(.caption)
                     .foregroundColor(.orange)
@@ -350,15 +346,13 @@ struct EditAvatarView: View {
     
     // MARK: - Functions
     private func validateForm() {
-        let validation = viewModel.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
+        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
         validationMessage = validation.isValid ? "" : validation.message
     }
     
     private func updateAvatar() {
-        print("updateAvatar() function called")
-        
         // Validate form
-        let validation = viewModel.validateAvatarData(name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines), excludingId: originalAvatar.id)
+        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines), excludingId: originalAvatar.id)
         
         if !validation.isValid {
             validationMessage = validation.message
@@ -383,12 +377,8 @@ struct EditAvatarView: View {
                 deepfakeReady: originalAvatar.deepfakeReady
             )
             
-            print("Updated avatar: \(updatedAvatar)")
-            
-            // Update avatar through viewModel
-            viewModel.updateAvatar(updatedAvatar)
-            
-            print("Avatar updated successfully")
+            // Update avatar through appViewModel
+            appViewModel.avatarManager.updateAvatar(updatedAvatar)
             
             // Reset loading state
             isUpdating = false
@@ -410,5 +400,5 @@ struct EditAvatarView: View {
         profileImg: "sample_avatar",
         deepfakeReady: true
     ))
-    .environmentObject(EnhancedMainViewModel())
+    .environmentObject(AppViewModel())
 }
