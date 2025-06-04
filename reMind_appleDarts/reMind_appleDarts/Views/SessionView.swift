@@ -48,7 +48,6 @@ struct SessionView: View {
         "Now, Tell me 1 thing you can TASTE?"
     ]
    
-
     
     var body: some View {
         ZStack {
@@ -120,7 +119,8 @@ struct SessionView: View {
                                 if prompts[currentStep] != "Its OKAY, I Got U" && prompts[currentStep] != "You are doing GREAT!!" {
                                     progress += 0.2
                                 }
-                                    currentStep += 1                         }) {
+                                    currentStep += 1
+                                    recorded = false}) {
                                     Image(systemName: "checkmark")
                                         .resizable()
                                         .scaledToFit()
