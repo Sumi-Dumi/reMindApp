@@ -55,6 +55,8 @@ struct RequestConsentView: View {
     }
 }
 
+
+
 struct ActivityView: UIViewControllerRepresentable {
     let activityItems: [Any]
     let applicationActivities: [UIActivity]? = nil
