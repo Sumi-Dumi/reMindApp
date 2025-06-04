@@ -42,6 +42,7 @@ struct SessionView: View {
                     .foregroundColor(.white)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 24)
+                    .frame(width: 346, height: 64)
                     .background(.black.opacity(0.4))
                     .background(.ultraThinMaterial)
                     .cornerRadius(12)
