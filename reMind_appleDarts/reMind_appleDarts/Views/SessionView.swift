@@ -9,10 +9,34 @@
 import SwiftUI
 import AVKit
 
+struct BlobButtonStyle: ButtonStyle {
+    @Binding var recorded: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            if configuration.isPressed {
+                BlobView(size: 100)
+
+            } else {
+                Circle()
+                    .fill(Color.black.opacity(0.4))
+                    
+            }
+            if !configuration.isPressed {
+                        configuration.label
+                            .foregroundColor(Color.primaryGreen)
+                                .frame(width: 40, height: 40)
+                        }
+
+        }
+        .frame(width: 100, height: 100)
+    }
+}
 
 struct SessionView: View {
     @State private var currentStep: Int = 0
-    @State private var progress: Float = 0.2
+//    @State private var progress: Float = 0.2
+    @State private var progress: Float = 0.6
+        @State private var recorded: Bool = false
 
     let prompts = [
         "Its OKAY, I Got U",
@@ -63,25 +87,7 @@ struct SessionView: View {
                 
                 // Mic + Controls
                 ZStack {
-                    Button(action: {
-                        // Move to next step
-                        if currentStep < prompts.count - 1 {
-                            currentStep += 1
-                            progress += 0.2
-                        }
-                    }) {
-                        Image(systemName: "mic.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40)
-                            .foregroundColor(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                            .padding(.horizontal, 40)
-                            .padding(.vertical, 26.66667)
-                            .frame(width: 100, height: 100)
-                            .background(.black.opacity(0.4))
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(100)
-                    }
+                    RecordButton(recorded: $recorded)
                     
                     HStack {
                         Button(action: {
@@ -100,6 +106,7 @@ struct SessionView: View {
                         HStack(spacing: 16) {
                             Button(action: {
                                 // Delete action
+                                recorded = false
                             }) {
                                 Image(systemName: "delete.left.fill")
                                     .resizable()
