@@ -19,7 +19,7 @@ struct Break: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
                 
-                Text("Just a bit more to support your sitautional distress!")
+                Text("Lastly, let me guide your breathing to help you relax!")
                     .font(.subheadline)
                     .foregroundColor(Color.gray)
                 

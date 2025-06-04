@@ -3,9 +3,10 @@ import UIKit
 
 struct RequestConsentView: View {
     @State private var showingShareSheet = false
+    @State private var recipientName: String = ""
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             Spacer()
 
             Text("Request Consent")
@@ -19,6 +20,20 @@ struct RequestConsentView: View {
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+            
+            TextField("Enter recipient's Name...", text: $recipientName)
+                .padding()
+                .frame(width: 346, height: 64)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.ultraThinMaterial)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                )
+                .foregroundColor(.black)
+
 
             Button(action: {
                 showingShareSheet = true
@@ -33,8 +48,10 @@ struct RequestConsentView: View {
                 .foregroundColor(.black)
                 .cornerRadius(15)
                 .font(.headline)
+                .opacity(recipientName.isEmpty ? 0.3 : 1.0)
             }
             .padding(.horizontal, 30)
+            .disabled(recipientName.isEmpty)
 
             Spacer()
         }
