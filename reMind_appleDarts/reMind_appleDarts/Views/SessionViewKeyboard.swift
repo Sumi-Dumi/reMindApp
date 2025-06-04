@@ -155,7 +155,9 @@ struct SessionViewKeyboard: View {
                     }
                     .padding(.top, 12)
                     .padding(.horizontal, 20)
+                    
                     Spacer()
+                    
                     Text("Now. Tell me 3 things you hear")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
