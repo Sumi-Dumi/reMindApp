@@ -53,9 +53,6 @@ struct SessionView: View {
     @State private var recorded: Bool = false
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -71,11 +68,8 @@ struct SessionView: View {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
             
 =======
-=======
->>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -116,7 +110,6 @@ struct SessionView: View {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
                     Button(action: {
                         // Move to next step
                         if currentStep < prompts.count - 1 {
@@ -151,11 +144,6 @@ struct SessionView: View {
                     
                     RecordButton(recorded: $recorded)
 >>>>>>> Stashed changes
-=======
-                    // Mic button
-                    
-                    RecordButton(recorded: $recorded)
->>>>>>> Stashed changes
                     
                     HStack {
                         Button(action: {
@@ -175,13 +163,9 @@ struct SessionView: View {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
                             Button(action: {
                                 // Delete action
                             }) {
-=======
-                            Button(action: {recorded = false}) {
->>>>>>> Stashed changes
 =======
                             Button(action: {recorded = false}) {
 >>>>>>> Stashed changes
