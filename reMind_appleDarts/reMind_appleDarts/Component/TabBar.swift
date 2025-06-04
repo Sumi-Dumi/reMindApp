@@ -43,13 +43,13 @@ struct MainTabView: View {
                         .frame(width: 2, height: 2)
                     Text("Start Session")
                 }
-
-            // My Profile
-           EditProfile()
-                .tabItem {
-                    Image(systemName: "person.fill")
-                    Text("My Profile")
-                }
+//
+//            // My Profile
+//           EditProfile()
+//                .tabItem {
+//                    Image(systemName: "person.fill")
+//                    Text("My Profile")
+//                }
 
             // Help
             ContentView()

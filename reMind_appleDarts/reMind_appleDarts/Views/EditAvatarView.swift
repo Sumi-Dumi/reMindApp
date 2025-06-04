@@ -1,9 +1,3 @@
-//
-//  EditAvatarView.swift
-//  reMind_appleDarts
-//
-//  Created by ryosuke on 3/6/2025.
-//
 import SwiftUI
 
 struct EditAvatarView: View {
@@ -39,7 +33,6 @@ struct EditAvatarView: View {
         self._isDefault = State(initialValue: avatar.isDefault)
     }
     
-    // Check if any changes have been made
     private var hasChanges: Bool {
         avatarName != originalAvatar.name ||
         selectedLanguage != originalAvatar.language ||
@@ -49,7 +42,6 @@ struct EditAvatarView: View {
         isDefault != originalAvatar.isDefault
     }
     
-    // Form validation
     private var isFormValid: Bool {
         let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
         return validation.isValid
@@ -58,21 +50,18 @@ struct EditAvatarView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Background
                 BackGroundView()
                 
                 ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
+                    VStack(spacing: 30) {
+                        Spacer(minLength: 40)
+                        
                         headerSection
                         
-                        // Form Fields
                         formFieldsSection
                         
-                        // Default Avatar Toggle
                         defaultToggleSection
                         
-                        // Validation Message
                         if !validationMessage.isEmpty {
                             Text(validationMessage)
                                 .font(.caption)
@@ -80,8 +69,9 @@ struct EditAvatarView: View {
                                 .padding(.horizontal, 30)
                         }
                         
-                        // Action Buttons
                         actionButtonsSection
+                        
+                        Spacer(minLength: 40)
                     }
                 }
             }
@@ -107,10 +97,8 @@ struct EditAvatarView: View {
         }
     }
     
-    // MARK: - Header Section
     private var headerSection: some View {
         VStack(spacing: 16) {
-            // Title
             VStack(spacing: 8) {
                 Text("Edit Avatar")
                     .font(.system(size: 28, weight: .bold))
@@ -123,10 +111,8 @@ struct EditAvatarView: View {
         }
     }
     
-    // MARK: - Form Fields Section
     private var formFieldsSection: some View {
         VStack(spacing: 20) {
-            // Avatar Name
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Avatar Name")
@@ -153,40 +139,30 @@ struct EditAvatarView: View {
                     )
             }
             
-            // Language Selection
             selectionField(
                 title: "Language",
                 selectedValue: selectedLanguage,
                 options: languages,
                 icon: "globe"
-            ) { language in
-                selectedLanguage = language
-            }
+            ) { selectedLanguage = $0 }
             
-            // Theme Selection
             selectionField(
                 title: "Theme",
                 selectedValue: selectedTheme,
                 options: themes,
                 icon: "paintpalette"
-            ) { theme in
-                selectedTheme = theme
-            }
+            ) { selectedTheme = $0 }
             
-            // Voice Tone Selection
             selectionField(
                 title: "Voice Tone",
                 selectedValue: selectedVoiceTone,
                 options: voiceTones,
                 icon: "speaker.wave.2"
-            ) { voiceTone in
-                selectedVoiceTone = voiceTone
-            }
+            ) { selectedVoiceTone = $0 }
         }
         .padding(.horizontal, 30)
     }
     
-    // MARK: - Default Toggle Section
     private var defaultToggleSection: some View {
         VStack(spacing: 12) {
             HStack {
@@ -195,9 +171,7 @@ struct EditAvatarView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondaryText)
                     
-                    Text(isDefault ?
-                         "This is your primary companion" :
-                         "Set as your primary companion")
+                    Text(isDefault ? "This is your primary companion" : "Set as your primary companion")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -227,10 +201,8 @@ struct EditAvatarView: View {
         .padding(.horizontal, 30)
     }
     
-    // MARK: - Action Buttons Section
     private var actionButtonsSection: some View {
         VStack(spacing: 16) {
-            // Changes indicator
             if hasChanges {
                 HStack {
                     Image(systemName: "exclamationmark.circle.fill")
@@ -245,7 +217,6 @@ struct EditAvatarView: View {
             }
             
             HStack(spacing: 16) {
-                // Cancel Button
                 Button(action: {
                     if hasChanges {
                         showingDiscardAlert = true
@@ -262,7 +233,6 @@ struct EditAvatarView: View {
                         .font(.headline)
                 }
                 
-                // Update Button
                 Button(action: updateAvatar) {
                     HStack {
                         if isUpdating {
@@ -274,11 +244,7 @@ struct EditAvatarView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(
-                        (!isFormValid || isUpdating || !hasChanges) ?
-                        Color.gray.opacity(0.5) :
-                        Color.primaryGreen
-                    )
+                    .background(Color.primaryGreen)
                     .foregroundColor(.black)
                     .cornerRadius(12)
                     .font(.headline)
@@ -290,14 +256,7 @@ struct EditAvatarView: View {
         .padding(.bottom, 30)
     }
     
-    // MARK: - Helper Views
-    private func selectionField(
-        title: String,
-        selectedValue: String,
-        options: [String],
-        icon: String,
-        onSelection: @escaping (String) -> Void
-    ) -> some View {
+    private func selectionField(title: String, selectedValue: String, options: [String], icon: String, onSelection: @escaping (String) -> Void) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.subheadline)
@@ -305,9 +264,7 @@ struct EditAvatarView: View {
             
             Menu {
                 ForEach(options, id: \.self) { option in
-                    Button(action: {
-                        onSelection(option)
-                    }) {
+                    Button(action: { onSelection(option) }) {
                         HStack {
                             Text(option)
                             if selectedValue == option {
@@ -344,14 +301,12 @@ struct EditAvatarView: View {
         }
     }
     
-    // MARK: - Functions
     private func validateForm() {
         let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
         validationMessage = validation.isValid ? "" : validation.message
     }
     
     private func updateAvatar() {
-        // Validate form
         let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines), excludingId: originalAvatar.id)
         
         if !validation.isValid {
@@ -359,13 +314,9 @@ struct EditAvatarView: View {
             return
         }
         
-        // Set loading state
         isUpdating = true
         
-        // Add a small delay to show loading state
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            
-            // Create updated avatar
             let updatedAvatar = Avatar(
                 id: originalAvatar.id,
                 name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -377,17 +328,13 @@ struct EditAvatarView: View {
                 deepfakeReady: originalAvatar.deepfakeReady
             )
             
-            // Update avatar through appViewModel
             appViewModel.avatarManager.updateAvatar(updatedAvatar)
-            
-            // Reset loading state
             isUpdating = false
-            
-            // Show success alert
             showSuccessAlert = true
         }
     }
 }
+
 
 #Preview {
     EditAvatarView(avatar: Avatar(
