@@ -9,8 +9,31 @@
 import SwiftUI
 import AVKit
 
+struct BlobButtonStyle: ButtonStyle {
+    @Binding var recorded: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            if configuration.isPressed {
+                BlobView(size: 100)
+
+            } else {
+                Circle()
+                    .fill(Color.black.opacity(0.4))
+                    
+            }
+            if !configuration.isPressed {
+                        configuration.label
+                            .foregroundColor(Color.primaryGreen)
+                                .frame(width: 40, height: 40)
+                        }
+
+        }
+        .frame(width: 100, height: 100)
+    }
+}
 
 struct SessionView: View {
+<<<<<<< Updated upstream
     @State private var currentStep: Int = 0
     @State private var progress: Float = 0.2
 
@@ -25,6 +48,10 @@ struct SessionView: View {
     ]
    
 
+=======
+    @State private var progress: Float = 0.6
+    @State private var recorded: Bool = false
+>>>>>>> Stashed changes
     
     var body: some View {
         ZStack {
@@ -32,7 +59,12 @@ struct SessionView: View {
             
             // Update this VideoView for different videos per step
             VideoView()
+<<<<<<< Updated upstream
             
+=======
+
+            // UI
+>>>>>>> Stashed changes
             VStack {
                 // Progress Bars
                 HStack(spacing: 6) {
@@ -63,6 +95,7 @@ struct SessionView: View {
                 
                 // Mic + Controls
                 ZStack {
+<<<<<<< Updated upstream
                     Button(action: {
                         // Move to next step
                         if currentStep < prompts.count - 1 {
@@ -82,6 +115,11 @@ struct SessionView: View {
                             .background(.ultraThinMaterial)
                             .cornerRadius(100)
                     }
+=======
+                    // Mic button
+                    
+                    RecordButton(recorded: $recorded)
+>>>>>>> Stashed changes
                     
                     HStack {
                         Button(action: {
@@ -98,9 +136,13 @@ struct SessionView: View {
                         Spacer()
                         
                         HStack(spacing: 16) {
+<<<<<<< Updated upstream
                             Button(action: {
                                 // Delete action
                             }) {
+=======
+                            Button(action: {recorded = false}) {
+>>>>>>> Stashed changes
                                 Image(systemName: "delete.left.fill")
                                     .resizable()
                                     .scaledToFit()
