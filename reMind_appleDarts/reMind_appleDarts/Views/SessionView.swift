@@ -13,6 +13,7 @@ import AVKit
 struct SessionView: View {
     @State private var currentStep: Int = 0
     @State private var progress: Float = 0.2
+    @State private var showKeyboardView = false
 
     let prompts = [
         "Its OKAY, I Got U",
@@ -85,6 +86,7 @@ struct SessionView: View {
                     
                     HStack {
                         Button(action: {
+                            showKeyboardView = true
                             // Keyboard action
                         }) {
                             Image(systemName: "keyboard")
@@ -94,7 +96,9 @@ struct SessionView: View {
                                 .foregroundColor(.white.opacity(0.8))
                         }
                         .padding(.leading, 24)
-                        
+                        .fullScreenCover(isPresented: $showKeyboardView) {
+                            SessionViewKeyboard()
+                        }
                         Spacer()
                         
                         HStack(spacing: 16) {
