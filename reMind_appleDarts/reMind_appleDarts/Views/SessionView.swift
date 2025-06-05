@@ -35,8 +35,8 @@ struct SessionView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.gray.ignoresSafeArea()
-                VideoView().ignoresSafeArea()
+                VideoView()
+                    .ignoresSafeArea()
 
                 LinearGradient(
                     gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
@@ -45,8 +45,8 @@ struct SessionView: View {
                 )
                 .ignoresSafeArea()
 
+                // Progress bar at top
                 VStack {
-                    // Progress Bars
                     HStack(spacing: 6) {
                         ForEach(0..<5) { index in
                             Capsule()
@@ -58,8 +58,14 @@ struct SessionView: View {
                     .padding(.horizontal, 20)
 
                     Spacer()
+                }
+                .frame(maxHeight: .infinity, alignment: .top)
+                .allowsHitTesting(false)
 
-                    // Prompt
+                // Prompt & input
+                VStack(spacing: 16) {
+                    Spacer().frame(height: 400)
+
                     Text(prompts[currentStep])
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
@@ -71,39 +77,60 @@ struct SessionView: View {
                         .cornerRadius(12)
                         .multilineTextAlignment(.center)
 
-                    Spacer()
-
-                    // Keyboard Input
                     if isKeyboardMode {
-                        VStack(spacing: 16) {
-                            TextField("Type Here...", text: $inputText, onCommit: {
-                                if !inputText.isEmpty && tags.count < 5 {
-                                    tags.append(inputText)
-                                    inputText = ""
-                                }
-                            })
-                            .padding()
-                            .frame(width: 346, height: 64)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(.ultraThinMaterial)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.white.opacity(0.5), lineWidth: 1)
-                            )
-                            .foregroundColor(.black)
-
-                            TagsView(tags: tags)
-                                .contentMargins(.horizontal, 24)
-                        }
+                        TextField("Type Here...", text: $inputText, onCommit: {
+                            if !inputText.isEmpty && tags.count < 5 {
+                                tags.insert(inputText, at: 0) // 최신 입력이 맨 앞에
+                                inputText = ""
+                            }
+                        })
+                        .padding()
+                        .frame(width: 346, height: 64)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1))
+                        .foregroundColor(.black)
                     }
 
                     Spacer()
+                }
+                .frame(maxHeight: .infinity, alignment: .top)
 
-                    // Bottom Controls
+                // Tags below input
+                if isKeyboardMode {
+                    VStack {
+                        Spacer().frame(height: 580)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(tags, id: \.self) { tag in
+                                    HStack(spacing: 4) {
+                                        Text(tag)
+                                            .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
+                                        Image(systemName: "xmark")
+                                            .resizable()
+                                            .frame(width: 10, height: 10)
+                                            .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color.white)
+                                    .clipShape(Capsule())
+                                }
+                            }
+                            .padding(.horizontal, 24)
+                        }
+
+                        Spacer()
+                    }
+                    .frame(maxHeight: .infinity)
+                    .allowsHitTesting(false)
+                }
+
+                // Bottom controls
+                VStack {
+                    Spacer()
+
                     ZStack {
-                        // Center Button
                         if isKeyboardMode {
                             Button(action: {}) {
                                 Image(systemName: "keyboard")
@@ -122,11 +149,13 @@ struct SessionView: View {
                             RecordButton(recorded: $recorded)
                         }
 
-                        // Left + Right Controls
                         HStack {
-                            // Left: toggle button
+                            // Toggle mic/keyboard
                             Button(action: {
                                 isKeyboardMode.toggle()
+                                recorded = false
+                                inputText = ""
+                                tags.removeAll()
                             }) {
                                 Image(systemName: isKeyboardMode ? "mic.fill" : "keyboard")
                                     .resizable()
@@ -141,14 +170,14 @@ struct SessionView: View {
 
                             Spacer()
 
-                            // Right: delete + next
                             HStack(spacing: 30) {
+                                // Clear input
                                 Button(action: {
                                     recorded = false
                                     inputText = ""
                                     tags.removeAll()
                                 }) {
-                                    Image("delete")
+                                    Image(systemName: "xmark")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 12, height: 12)
@@ -158,6 +187,7 @@ struct SessionView: View {
                                         .foregroundColor(.white)
                                 }
 
+                                // Next step
                                 Button(action: {
                                     if currentStep < prompts.count - 1 {
                                         currentStep += 1
@@ -181,8 +211,6 @@ struct SessionView: View {
                         }
                         .padding(.horizontal, 30)
                     }
-                    .frame(height: 60)
-                    .frame(maxWidth: .infinity)
                     .padding(.bottom, 24)
                 }
 
