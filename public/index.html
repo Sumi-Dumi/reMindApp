@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./css/style.css" />
+  <title>reMind - Help Someone Feel Safer</title>
+</head>
+<body>
+  <div class="mobile-interface">
+    <div class="main">
+      <div class="header">
+        <p class="header-text">
+          Help someone you love feel a <br />
+          little safer
+        </p>
+        <p class="subheader-text">
+          Your loved one has chosen you to help bring them comfort during
+          difficult moments.
+        </p>
+      </div>
+
+      <!-- Creator Name Input (新規追加) -->
+      <div class="creator-section">
+        <p>Your name (who is sending this)</p>
+        <input 
+          type="text" 
+          id="creatorName" 
+          placeholder="Enter your name..."
+          class="input-field"
+        />
+      </div>
+
+      <!-- Recipient Name Input (新規追加) -->
+      <div class="recipient-section">
+        <p>Who is this for?</p>
+        <input 
+          type="text" 
+          id="recipientName" 
+          placeholder="Enter their name..."
+          class="input-field"
+        />
+      </div>
+
+      <div class="image-section">
+        <p>Provide 3 pictures of yourself</p>
+        <div class="image">
+          <img src="./src/image/image-add.png" alt="addimage" />
+          <p>Tap to add images or drag and drop</p>
+        </div>
+        
+        <!-- Upload Progress (新規追加) -->
+        <div id="imageUploadProgress" class="upload-progress" style="display: none;">
+          <div class="progress-bar">
+            <div id="imageProgressBar" class="progress-fill"></div>
+          </div>
+          <p id="imageProgressText" class="progress-text">Uploading images...</p>
+        </div>
+      </div>
+
+      <div class="audio">
+        <p>1 minute audio recording</p>
+        <div class="mic-audio">
+          <img src="./src/image/Mic.png" alt="audio" />
+          <img src="./src/image/soundwave.png" />
+        </div>
+        
+        <!-- Audio Upload Progress (新規追加) -->
+        <div id="audioUploadProgress" class="upload-progress" style="display: none;">
+          <div class="progress-bar">
+            <div id="audioProgressBar" class="progress-fill"></div>
+          </div>
+          <p id="audioProgressText" class="progress-text">Uploading audio...</p>
+        </div>
+      </div>
+
+      <!-- Success Message (新規追加) -->
+      <div id="successMessage" class="message success-message" style="display: none;">
+        <p class="message-title">✓ Upload Successful!</p>
+        <p class="message-content">Your avatar has been created successfully.</p>
+      </div>
+
+      <!-- Error Message (新規追加) -->
+      <div id="errorMessage" class="message error-message" style="display: none;">
+        <p class="message-title">❌ Upload Failed</p>
+        <p id="errorText" class="message-content">Please try again.</p>
+      </div>
+
+      <div class="submit-section">
+        <button class="button-primary" id="submitBtn">Submit</button>
+        <div class="agree-terms">
+          <div class="checkbox"></div>
+          <p>I agree to the Terms & Conditions and Privacy Policy.*</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (Firebase CLI用) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Auto-Configuration (Firebase CLI hosting用) -->
+  <script src="/__/firebase/init.js"></script>
+
+  <!-- Application Script -->
+  <script src="./script/firebase-app.js"></script>
+</body>
+</html>
