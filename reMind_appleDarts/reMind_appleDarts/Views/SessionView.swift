@@ -3,6 +3,7 @@ import AVKit
 
 struct BlobButtonStyle: ButtonStyle {
     @Binding var recorded: Bool
+
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
             if configuration.isPressed {
@@ -13,7 +14,7 @@ struct BlobButtonStyle: ButtonStyle {
             }
             if !configuration.isPressed {
                 configuration.label
-                    .foregroundColor(Color.primaryGreen)
+                    .foregroundColor(.green)
                     .frame(width: 40, height: 40)
             }
         }
@@ -28,13 +29,13 @@ struct SessionView: View {
 
     private var progress: Float {
         switch currentStep {
-        case 0: return 0.0 // "Its OKAY, I Got U"
-        case 1: return 0.2 // "SEE"
-        case 2: return 0.2 // "TOUCH"
-        case 3: return 0.4 // "You are doing GREAT!!"
-        case 4: return 0.6 // "HEAR"
-        case 5: return 0.8 // "SMELL"
-        case 6: return 1.0 // "TASTE"
+        case 0: return 0.0
+        case 1: return 0.2
+        case 2: return 0.2
+        case 3: return 0.4
+        case 4: return 0.6
+        case 5: return 0.8
+        case 6: return 1.0
         default: return 1.0
         }
     }
@@ -50,74 +51,15 @@ struct SessionView: View {
     ]
 
     var body: some View {
-        ZStack {
-            Color.gray.ignoresSafeArea()
-            
-            
-            
-            // Update this VideoView for different videos per step
-            VideoView()
-            LinearGradient(
-                gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            VStack {
-                // Progress Bars
-                HStack(spacing: 6) {
-                    ForEach(0..<5) { index in
-                        Capsule()
-                            .frame(height: 4)
-                            .foregroundColor(Float(index) < progress * 5 ? .white : .white.opacity(0.3))
-                    }
-                }
-                .padding(.top, 12)
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                // Dynamic Prompt Text
-                Text(prompts[currentStep])
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 24)
-                    .frame(width: 346, height: 64)
-                    .background(.black.opacity(0.4))
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(12)
-                    .multilineTextAlignment(.center)
-                
-                Spacer().frame(height: 80)
-                
-                // Mic + Controls
-                ZStack {
-                    RecordButton(recorded: $recorded)
-                    
-                    HStack {
-                        Button(action: {
-                            // Keyboard action
-                        }) {
-                            Image(systemName: "keyboard")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(15)
-                                .foregroundColor(.white.opacity(0.8))
-                                .background(Color.black.opacity(0.3))
-                                .clipShape(Circle())
-                        }
-                        .padding(.leading, 30)
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 30) {
         NavigationStack {
             ZStack {
                 Color.gray.ignoresSafeArea()
-                VideoView()
+                VideoView().ignoresSafeArea()
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                ).ignoresSafeArea()
 
                 VStack {
                     // Progress Bars
@@ -133,14 +75,14 @@ struct SessionView: View {
 
                     Spacer()
 
-                    // Prompt
+                    // Prompt Text
                     Text(prompts[currentStep])
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.vertical, 12)
                         .padding(.horizontal, 24)
                         .frame(width: 346, height: 64)
-                        .background(.black.opacity(0.4))
+                        .background(Color.black.opacity(0.4))
                         .background(.ultraThinMaterial)
                         .cornerRadius(12)
                         .multilineTextAlignment(.center)
@@ -152,46 +94,39 @@ struct SessionView: View {
                         RecordButton(recorded: $recorded)
 
                         HStack {
+                            // Keyboard Button
                             Button(action: {
-                                // Keyboard action
-
-//                                Image(systemName: "delete.left.fill")
-                                Image("delete")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 12, height: 12)
-                                        .padding(10) // Add padding so background looks better
-                                        .background(Color.black.opacity(0.3))
-                                        .clipShape(Circle()) // Or use .cornerRadius(8) for a rounded rectangle
-                                        .foregroundColor(.white)
-                            }
-                            
-                            Button(action: {
-                                // Next step
-                                if prompts[currentStep] != "Its OKAY, I'm here for you" && prompts[currentStep] != "You are doing GREAT!!" {
-                                    progress += 0.2
-
+                                // Handle keyboard tap
+                            }) {
                                 Image(systemName: "keyboard")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 30, height: 30)
+                                    .padding(15)
                                     .foregroundColor(.white.opacity(0.8))
+                                    .background(Color.black.opacity(0.3))
+                                    .clipShape(Circle())
                             }
-                            .padding(.leading, 24)
+                            .padding(.leading, 30)
 
                             Spacer()
 
                             HStack(spacing: 16) {
+                                // Delete Button
                                 Button(action: {
                                     recorded = false
                                 }) {
-                                    Image(systemName: "delete.left.fill")
+                                    Image("delete")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 24, height: 24)
+                                        .frame(width: 18, height: 18)
+                                        .padding(10)
+                                        .background(Color.black.opacity(0.3))
+                                        .clipShape(Circle())
                                         .foregroundColor(.white)
                                 }
 
+                                // Next Step Button
                                 Button(action: {
                                     if currentStep < prompts.count - 1 {
                                         currentStep += 1
@@ -211,18 +146,14 @@ struct SessionView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 40)
+                        .padding(.horizontal, 30)
                     }
-
-                    .padding(.horizontal, 30)
-
                 }
 
                 // Navigation Trigger
                 NavigationLink(destination: Break(), isActive: $navigateToBreak) {
-                                    EmptyView()
-                                }
-            
+                                                    EmptyView()
+                }
             }
         }
     }
