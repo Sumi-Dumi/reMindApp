@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RegisterView: View {
     @State private var isRegistered = false
-    @State private var dummyText = "" // 실제 사용하지 않음
+    @State private var dummyText = "" 
 
     var body: some View {
         NavigationStack {

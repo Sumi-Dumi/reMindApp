@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EndSessionView: View {
     @State private var showSessionView = false
+    @State private var showMainView = false
     var body: some View {
         ZStack {
             // Background gradient
@@ -45,6 +46,7 @@ struct EndSessionView: View {
                     // Finish
                     Button(action: {
                         // Finish action
+                        showMainView = true
                     }) {
                         Text("Finish")
                             .fontWeight(.medium)
@@ -52,6 +54,9 @@ struct EndSessionView: View {
                             .frame(minWidth: 120, minHeight: 44)
                             .background(Color.primaryGreen)
                             .cornerRadius(12)
+                    }
+                    .fullScreenCover(isPresented: $showMainView) {
+                        MainView()
                     }
                 }
             }
