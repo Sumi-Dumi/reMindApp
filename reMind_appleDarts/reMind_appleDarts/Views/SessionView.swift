@@ -5,7 +5,7 @@ struct TagView: View {
     let tags: [String]
     let horizontalSpacing: CGFloat
     let verticalSpacing: CGFloat
-    let onRemove: (String) -> Void // 태그 삭제 콜백
+    let onRemove: (String) -> Void
 
     init(tags: [String],
          horizontalSpacing: CGFloat = 8,
@@ -110,7 +110,7 @@ struct SessionView: View {
                 .frame(maxHeight: .infinity, alignment: .top)
 
                 VStack(spacing: 16) {
-                    Spacer().frame(height: 400)
+                    Spacer().frame(height: isKeyboardMode ? 400 : 500)
 
                     Text(prompts[currentStep])
                         .font(.system(size: 16, weight: .semibold))
@@ -127,7 +127,9 @@ struct SessionView: View {
                         TextField("Type Here...", text: $inputText, onCommit: {
                             if !inputText.isEmpty && tags.count < 5 {
                                 tags.insert(inputText, at: 0)
-                                inputText = ""
+                                DispatchQueue.main.async {
+                                            inputText = ""
+                                        }
                             }
                         })
                         .padding()
@@ -135,6 +137,7 @@ struct SessionView: View {
                         .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1))
                         .foregroundColor(.black)
+                        
                     }
 
                     Spacer()
@@ -143,7 +146,7 @@ struct SessionView: View {
 
                 if isKeyboardMode {
                     VStack {
-                        Spacer().frame(height: 580)
+                        Spacer().frame(height: 570)
 
                         TagView(tags: tags, onRemove: { tag in
                             tags.removeAll { $0 == tag }
