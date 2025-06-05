@@ -39,7 +39,7 @@ struct SessionView: View {
         @State private var recorded: Bool = false
 
     let prompts = [
-        "Its OKAY, I Got U",
+        "Its OKAY, I'm here for you",
         "Now, What are 5 things you can SEE?",
         "Now, Tell me 4 things you can TOUCH?",
         "You are doing GREAT!!",
@@ -53,8 +53,16 @@ struct SessionView: View {
         ZStack {
             Color.gray.ignoresSafeArea()
             
+            
+            
             // Update this VideoView for different videos per step
             VideoView()
+            LinearGradient(
+                gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
             VStack {
                 // Progress Bars
@@ -95,28 +103,35 @@ struct SessionView: View {
                             Image(systemName: "keyboard")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 28, height: 28)
+                                .frame(width: 30, height: 30)
+                                .padding(15)
                                 .foregroundColor(.white.opacity(0.8))
+                                .background(Color.black.opacity(0.3))
+                                .clipShape(Circle())
                         }
-                        .padding(.leading, 24)
+                        .padding(.leading, 30)
                         
                         Spacer()
                         
-                        HStack(spacing: 16) {
+                        HStack(spacing: 30) {
                             Button(action: {
                                 // Delete action
                                 recorded = false
                             }) {
-                                Image(systemName: "delete.left.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                                    .foregroundColor(.white)
+//                                Image(systemName: "delete.left.fill")
+                                Image("delete")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 12, height: 12)
+                                        .padding(10) // Add padding so background looks better
+                                        .background(Color.black.opacity(0.3))
+                                        .clipShape(Circle()) // Or use .cornerRadius(8) for a rounded rectangle
+                                        .foregroundColor(.white)
                             }
                             
                             Button(action: {
                                 // Next step
-                                if prompts[currentStep] != "Its OKAY, I Got U" && prompts[currentStep] != "You are doing GREAT!!" {
+                                if prompts[currentStep] != "Its OKAY, I'm here for you" && prompts[currentStep] != "You are doing GREAT!!" {
                                     progress += 0.2
                                 }
                                     currentStep += 1
@@ -132,7 +147,7 @@ struct SessionView: View {
                                 }
                         }
                     }
-                    .padding(.horizontal, 40)
+                    .padding(.horizontal, 30)
                 }
             }
         }
