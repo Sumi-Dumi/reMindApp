@@ -80,7 +80,7 @@ struct SessionView: View {
                     if isKeyboardMode {
                         TextField("Type Here...", text: $inputText, onCommit: {
                             if !inputText.isEmpty && tags.count < 5 {
-                                tags.insert(inputText, at: 0) // 최신 입력이 맨 앞에
+                                tags.insert(inputText, at: 0) 
                                 inputText = ""
                             }
                         })

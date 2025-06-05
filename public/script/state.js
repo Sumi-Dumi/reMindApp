@@ -12,8 +12,8 @@ const initialState = {
   isSubmitting: false,
   images: [],
   maxImages: APP_CONFIG.maxImages,
-  recipientName: '',
-  creatorName: '',
+  recipientName: 'User',        
+  creatorName: 'Creator', 
   isRecording: false,
   mediaRecorder: null,
   audioChunks: [],
@@ -95,9 +95,7 @@ export class AppState {
   canSubmit() {
     return this.state.isChecked && 
            this.state.images.length >= 1 && 
-           this.state.hasAudio &&
-           this.state.recipientName.length > 0 &&
-           this.state.creatorName.length > 0;
+           this.state.hasAudio;
   }
 }
 
