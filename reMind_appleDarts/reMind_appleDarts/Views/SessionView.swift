@@ -1,6 +1,55 @@
 import SwiftUI
 import AVKit
 
+struct TagView: View {
+    let tags: [String]
+    let horizontalSpacing: CGFloat
+    let verticalSpacing: CGFloat
+    let onRemove: (String) -> Void // 태그 삭제 콜백
+
+    init(tags: [String],
+         horizontalSpacing: CGFloat = 8,
+         verticalSpacing: CGFloat = 8,
+         onRemove: @escaping (String) -> Void) {
+        self.tags = tags
+        self.horizontalSpacing = horizontalSpacing
+        self.verticalSpacing = verticalSpacing
+        self.onRemove = onRemove
+    }
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: horizontalSpacing) {
+                ForEach(tags, id: \.self) { tag in
+                    tagView(for: tag)
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+        .frame(height: 50)
+    }
+
+    private func tagView(for text: String) -> some View {
+        HStack(spacing: 4) {
+            Text(text)
+                .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
+
+            Button(action: {
+                onRemove(text)
+            }) {
+                Image(systemName: "xmark")
+                    .resizable()
+                    .frame(width: 10, height: 10)
+                    .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.white)
+        .clipShape(Capsule())
+    }
+}
+
 struct SessionView: View {
     @State private var currentStep: Int = 0
     @State private var recorded: Bool = false
@@ -45,7 +94,6 @@ struct SessionView: View {
                 )
                 .ignoresSafeArea()
 
-                // Progress bar at top
                 VStack {
                     HStack(spacing: 6) {
                         ForEach(0..<5) { index in
@@ -60,9 +108,7 @@ struct SessionView: View {
                     Spacer()
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
-                .allowsHitTesting(false)
 
-                // Prompt & input
                 VStack(spacing: 16) {
                     Spacer().frame(height: 400)
 
@@ -80,7 +126,7 @@ struct SessionView: View {
                     if isKeyboardMode {
                         TextField("Type Here...", text: $inputText, onCommit: {
                             if !inputText.isEmpty && tags.count < 5 {
-                                tags.insert(inputText, at: 0) 
+                                tags.insert(inputText, at: 0)
                                 inputText = ""
                             }
                         })
@@ -95,38 +141,20 @@ struct SessionView: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
 
-                // Tags below input
                 if isKeyboardMode {
                     VStack {
                         Spacer().frame(height: 580)
 
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(tags, id: \.self) { tag in
-                                    HStack(spacing: 4) {
-                                        Text(tag)
-                                            .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
-                                        Image(systemName: "xmark")
-                                            .resizable()
-                                            .frame(width: 10, height: 10)
-                                            .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
-                                    }
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.white)
-                                    .clipShape(Capsule())
-                                }
-                            }
-                            .padding(.horizontal, 24)
-                        }
+                        TagView(tags: tags, onRemove: { tag in
+                            tags.removeAll { $0 == tag }
+                        })
+                        .frame(width: 346, height: 50)
+                        .padding(.horizontal, 24)
 
                         Spacer()
                     }
-                    .frame(maxHeight: .infinity)
-                    .allowsHitTesting(false)
                 }
 
-                // Bottom controls
                 VStack {
                     Spacer()
 
@@ -150,7 +178,6 @@ struct SessionView: View {
                         }
 
                         HStack {
-                            // Toggle mic/keyboard
                             Button(action: {
                                 isKeyboardMode.toggle()
                                 recorded = false
@@ -171,7 +198,6 @@ struct SessionView: View {
                             Spacer()
 
                             HStack(spacing: 30) {
-                                // Clear input
                                 Button(action: {
                                     recorded = false
                                     inputText = ""
@@ -187,7 +213,6 @@ struct SessionView: View {
                                         .foregroundColor(.white)
                                 }
 
-                                // Next step
                                 Button(action: {
                                     if currentStep < prompts.count - 1 {
                                         currentStep += 1
