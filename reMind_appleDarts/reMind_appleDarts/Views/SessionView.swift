@@ -36,7 +36,14 @@ struct SessionView: View {
         NavigationStack {
             ZStack {
                 Color.gray.ignoresSafeArea()
-                VideoView().ignoresSafeArea()
+                VideoView()
+                LinearGradient(
+                                gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .ignoresSafeArea()
+                
 
                 VStack {
                     // Top Progress
