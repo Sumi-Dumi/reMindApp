@@ -34,9 +34,22 @@ struct BlobButtonStyle: ButtonStyle {
 
 struct SessionView: View {
     @State private var currentStep: Int = 0
-//    @State private var progress: Float = 0.2
-    @State private var progress: Float = 0.6
-        @State private var recorded: Bool = false
+    @State private var recorded: Bool = false
+
+    private var progress: Float {
+        switch currentStep {
+        case 0: return 0.0 // "Its OKAY, I Got U"
+        case 1: return 0.2 // "SEE"
+        case 2: return 0.2 // "TOUCH"
+        case 3: return 0.4 // "You are doing GREAT!!"
+        case 4: return 0.6 // "HEAR"
+        case 5: return 0.8 // "SMELL"
+        case 6: return 1.0 // "TASTE"
+        default: return 1.0
+        }
+    }
+
+   
 
     let prompts = [
         "Its OKAY, I Got U",
@@ -115,21 +128,21 @@ struct SessionView: View {
                             }
                             
                             Button(action: {
-                                // Next step
-                                if prompts[currentStep] != "Its OKAY, I Got U" && prompts[currentStep] != "You are doing GREAT!!" {
-                                    progress += 0.2
-                                }
+                                if currentStep < prompts.count - 1 {
                                     currentStep += 1
-                                    recorded = false}) {
-                                    Image(systemName: "checkmark")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 12, height: 12)
-                                        .foregroundColor(.black)
-                                        .padding(8)
-                                        .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                                        .clipShape(Circle())
+                                    recorded = false
                                 }
+                            }) {
+                                Image(systemName: "checkmark")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 12, height: 12)
+                                    .foregroundColor(.black)
+                                    .padding(8)
+                                    .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
+                                    .clipShape(Circle())
+                            }
+
                         }
                     }
                     .padding(.horizontal, 40)
