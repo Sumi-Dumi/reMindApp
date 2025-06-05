@@ -93,6 +93,8 @@ struct PulsingView: View {
     @State private var isPulsing = false
     @State private var currentAffirmation = 0
     @State private var animateAffirmation = false
+    @State private var showEndSession = false
+ 
 
     // Updated affirmations
     private let affirmations = [
@@ -104,6 +106,7 @@ struct PulsingView: View {
     ]
 
     var body: some View {
+        
         GeometryReader { geo in
             let minSide = min(geo.size.width, geo.size.height)
 
@@ -172,6 +175,7 @@ struct PulsingView: View {
 
                     // Finish button
                     Button(action: {
+                        showEndSession = true
                         // Add your finish action here
                     }) {
                         Text("Finish")
@@ -185,6 +189,10 @@ struct PulsingView: View {
                             .foregroundColor(.primaryText)
                     }
                     .padding(.horizontal, 80)
+                    .fullScreenCover(isPresented: $showEndSession) {
+                        EndSessionView()
+                    }
+                    
                 }
                 // Position this VStack near the bottom half
                 .position(x: geo.size.width / 2, y: geo.size.height * 0.75)
@@ -193,10 +201,16 @@ struct PulsingView: View {
                     Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { _ in
                         currentAffirmation = (currentAffirmation + 1) % affirmations.count
                     }
+                    
                 }
+               
             }
+           
         }
+       
     }
+    
+    
 }
 
 struct PulsingView_Previews: PreviewProvider {
