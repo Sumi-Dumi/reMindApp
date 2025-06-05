@@ -25,7 +25,7 @@
       </div>
 
       <!-- Creator Name Input (新規追加) -->
-      <div class="creator-section">
+      <!-- <div class="creator-section">
         <p>Your name (who is sending this)</p>
         <input 
           type="text" 
@@ -33,10 +33,10 @@
           placeholder="Enter your name..."
           class="input-field"
         />
-      </div>
+      </div> -->
 
       <!-- Recipient Name Input (新規追加) -->
-      <div class="recipient-section">
+      <!-- <div class="recipient-section">
         <p>Who is this for?</p>
         <input 
           type="text" 
@@ -44,13 +44,12 @@
           placeholder="Enter their name..."
           class="input-field"
         />
-      </div>
+      </div> -->
 
       <div class="image-section">
         <p>Provide 3 pictures of yourself</p>
         <div class="image">
           <img src="./src/image/image-add.png" alt="addimage" />
-          <p>Tap to add images or drag and drop</p>
         </div>
         
         <!-- Upload Progress (新規追加) -->
@@ -79,16 +78,16 @@
       </div>
 
       <!-- Success Message (新規追加) -->
-      <div id="successMessage" class="message success-message" style="display: none;">
+      <!-- <div id="successMessage" class="message success-message" style="display: none;">
         <p class="message-title">✓ Upload Successful!</p>
         <p class="message-content">Your avatar has been created successfully.</p>
-      </div>
+      </div> -->
 
-      <!-- Error Message (新規追加) -->
+      <!-- Error Message (新規追加)
       <div id="errorMessage" class="message error-message" style="display: none;">
         <p class="message-title">❌ Upload Failed</p>
         <p id="errorText" class="message-content">Please try again.</p>
-      </div>
+      </div> -->
 
       <div class="submit-section">
         <button class="button-primary" id="submitBtn">Submit</button>
@@ -108,6 +107,6 @@
   <script src="/__/firebase/init.js"></script>
 
   <!-- Application Script -->
-  <script src="./script/firebase-app.js"></script>
+  <script type="module" src="./script/app.js"></script>
 </body>
 </html>
