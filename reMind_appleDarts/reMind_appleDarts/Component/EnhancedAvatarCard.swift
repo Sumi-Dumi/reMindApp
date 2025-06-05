@@ -34,7 +34,7 @@ struct EnhancedAvatarCard: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(avatar.isDefault ? Color(red: 184/255, green: 192/255, blue: 204/255) : Color.gray.opacity(0.5),
-                            lineWidth: avatar.isDefault ? 1.5 : 1)
+                            lineWidth: avatar.isDefault ? 1 : 1)
             )
             .frame(width: 380, height: 120)
             .overlay(
@@ -78,14 +78,16 @@ struct EnhancedAvatarCard: View {
                         NavigationLink(destination: SessionView()) {
                             HStack(alignment: .center, spacing: 8) {
                                 Image(systemName: "play.fill")
+                                    .font(.system(size: 12))
                                     .foregroundColor(Color.black)
+                                   
                                 Text("Start session")
                                     .font(
                                         Font.custom("SF Pro", size: 10)
                                             .weight(.bold)
                                     )
                                 .foregroundColor(.black)}
-                            .padding(.horizontal, 12)
+                            .padding(.horizontal, 10)
                             .padding(.vertical, 8)
                             .background(Color.primaryGreen)
                             .cornerRadius(4)

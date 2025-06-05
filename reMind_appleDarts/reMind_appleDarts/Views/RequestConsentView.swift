@@ -8,18 +8,21 @@ struct RequestConsentView: View {
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
+            
+            VStack (spacing: 12){
+                Text("Request Consent")
+                    .font(.title2.bold())
+                    .foregroundColor(.primaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
 
-            Text("Request Consent")
-                .font(.title2.bold())
-                .foregroundColor(.primaryText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
-            Text("Follow these steps for the best experience on this app")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
+                Text("Follow these steps for the best experience on this app")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 46)
+                
+            }
             
             TextField("Enter recipient's Name...", text: $recipientName)
                 .padding()

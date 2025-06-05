@@ -17,7 +17,9 @@ struct EditAvatarView: View {
     @State private var isUpdating = false
     @State private var validationMessage = ""
     @State private var showingDiscardAlert = false
+    @State private var showingDeleteAlert = false
     
+
     private let languages = ["English", "Japanese", "Spanish", "French", "German", "Italian"]
     private let themes = ["Calm", "Energetic", "Peaceful", "Motivational", "Relaxing", "Cheerful"]
     private let voiceTones = ["Gentle", "Soft", "Medium", "Warm", "Clear", "Soothing"]
@@ -54,7 +56,8 @@ struct EditAvatarView: View {
                 
                 ScrollView {
                     VStack(spacing: 30) {
-                        Spacer(minLength: 40)
+                        
+                        
                         
                         headerSection
                         
@@ -74,6 +77,7 @@ struct EditAvatarView: View {
                         Spacer(minLength: 40)
                     }
                 }
+                .padding(.top, 20)
             }
         }
         .navigationBarHidden(true)
@@ -83,6 +87,14 @@ struct EditAvatarView: View {
             }
         } message: {
             Text("Your avatar '\(avatarName)' has been updated successfully!")
+        }
+        .alert("Delete Avatar?", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                deleteAvatar()
+            }
+        } message: {
+            Text("Are you sure you want to delete the avatar '\(avatarName)'? This action cannot be undone.")
         }
         .alert("Discard Changes?", isPresented: $showingDiscardAlert) {
             Button("Keep Editing", role: .cancel) {}
@@ -97,19 +109,40 @@ struct EditAvatarView: View {
         }
     }
     
+    
     private var headerSection: some View {
-        VStack(spacing: 16) {
-            VStack(spacing: 8) {
-                Text("Edit Avatar")
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(.primaryText)
+        VStack(spacing: 20) {
+            VStack{
+                HStack {
+                    Text("Edit Avatar")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.primaryText)
+
+                    
+
+                    Button(action: {
+                        showingDeleteAlert = true
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                            .font(.system(size: 16, weight: .bold))
+                    }
+                    .padding(.trailing, 5)
+                }
+
+                    Text("Design your personal support companion")
+                        .font(.subheadline)
+                        .foregroundColor(.secondaryText)
                 
-                Text("Update your support companion")
-                    .font(.subheadline)
-                    .foregroundColor(.secondaryText)
+                
+            }
+
+                Image("userProfile")
+                    .resizable()
+                    .frame(width: 100, height: 100)
+                    .clipShape(Circle())
             }
         }
-    }
     
     private var formFieldsSection: some View {
         VStack(spacing: 20) {
@@ -305,6 +338,12 @@ struct EditAvatarView: View {
         let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
         validationMessage = validation.isValid ? "" : validation.message
     }
+    private func deleteAvatar() {
+        appViewModel.avatarManager.deleteAvatar(withId: originalAvatar.id)
+        presentationMode.wrappedValue.dismiss()
+    }
+
+
     
     private func updateAvatar() {
         let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines), excludingId: originalAvatar.id)
