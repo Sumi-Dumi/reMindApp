@@ -17,37 +17,13 @@ struct TagsView: View {
     
     var body: some View {
         
-        return ScrollView(.horizontal){
+        return ScrollView(.horizontal) {
             HStack {
-                ForEach(tags, id: \.self) { tag in
+                ForEach(tags.reversed(), id: \.self) { tag in
                     tagView(for: tag)
-                    //                    .alignmentGuide(.leading) { d in
-                    //                        if abs(width - d.width) > UIScreen.main.bounds.width - 48 {
-                    //                            width = 0
-                    //                            height -= lastHeight + verticalSpacing
-                    //                            totalHeight += lastHeight + verticalSpacing
-                    //                        }
-                    //                        let result = width
-                    //                        if tag == tags.last {
-                    //                            width = 0
-                    //                        } else {
-                    //                            width -= d.width + horizontalSpacing
-                    //                        }
-                    //                        return result
-                    //                    }
-                    //                    .alignmentGuide(.top) { d in
-                    //                        let result = height
-                    //                        lastHeight = d.height
-                    //                        if tag == tags.first {
-                    //                            totalHeight = d.height
-                    //                        }
-                    //                        return result
-                    //                    }
                 }
             }
         }
-//        .frame(maxWidth: .infinity, minHeight: totalHeight, alignment: .topLeading)
-//        .padding(.vertical, 4)
     }
     
     private func tagView(for text: String) -> some View {
@@ -124,15 +100,13 @@ struct SessionViewKeyboard: View {
                         .stroke(Color.white.opacity(0.5), lineWidth: 1)
                 )
                 .foregroundColor(.black)
-                
+                TagsView(tags: tags)
+                    .contentMargins(.horizontal, 24)
                 Spacer()
             }
             .frame(maxHeight: .infinity, alignment: .top)
             
-            // Fixed-position TagsView (above mic, below input field)
-            
-            
-            // Bottom mic + buttons
+
             VStack {
                 Spacer()
                 
@@ -190,17 +164,6 @@ struct SessionViewKeyboard: View {
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
             .allowsHitTesting(false)
-            
-            
-            //                Spacer().frame(height: 580) // Adjust vertical position of tag box
-            
-            TagsView(tags: tags)
-                .contentMargins(.horizontal, 24)
-            
-            
-            
-            //            .frame(maxHeight: .infinity)
-            //            .allowsHitTesting(false)
         }
     }
 }

@@ -29,126 +29,105 @@ struct EnhancedAvatarCard: View {
     }
     
     var body: some View {
-        ZStack{
-            // border rectangle
-            Rectangle()
-                .fill(Color.white)
-                .opacity(0.1)
-                .frame(width: 380, height: 120)
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(avatar.isDefault ? Color.primaryGreen.opacity(0.6) : Color.gray, lineWidth: avatar.isDefault ? 2 : 1)
-                        .opacity(avatar.isDefault ? 1.0 : 0.5)
-                )
-            
-            HStack{
-                // image
-                Image(avatar.profileImg)
-                    .resizable()
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(100)
-                    .overlay(
-                        Circle()
-                            .stroke(avatar.isDefault ? Color.primaryGreen.opacity(0.4) : Color.clear, lineWidth: 3)
-                    )
-                
-                // text
-                VStack(alignment: .leading, spacing: 4){
-                    HStack{
-                        Text(avatar.name)
-                            .font(.headline)
-                            .foregroundColor(.primaryText)
-                        
-                        if avatar.isDefault {
-                            ZStack{
-                                Rectangle()
-                                    .foregroundColor(avatar.tagColor)
-                                    .frame(width: 60, height: 30)
-                                    .cornerRadius(10)
-                                Text("default")
-                                    .font(.caption)
-                                    .foregroundColor(.black)
+        RoundedRectangle(cornerRadius: 10)
+            .fill(Color.white.opacity(0.1))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(avatar.isDefault ? Color(red: 184/255, green: 192/255, blue: 204/255) : Color.gray.opacity(0.5),
+                            lineWidth: avatar.isDefault ? 1.5 : 1)
+            )
+            .frame(width: 380, height: 120)
+            .overlay(
+                HStack (spacing: 8){
+                    // Image
+                    Image(avatar.profileImg)
+                        .resizable()
+                        .frame(width: 68, height: 72)
+                        .clipShape(Circle())
+                    
+                    // Text content
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(avatar.name)
+                                .font(.headline)
+                                .foregroundColor(.primaryText)
+                            
+                            if avatar.isDefault {
+                                Text("Default")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(Color(red: 52/255, green: 211/255, blue: 153/255))
+                                    .cornerRadius(150)
                             }
                         }
+                        
+                        Text(avatar.displayDescription)
+                            .font(
+                                Font.custom("SF Pro", size: 10)
+                                    .weight(.medium)
+                            )
+                            .foregroundColor(Color(red: 0.39, green: 0.45, blue: 0.55))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     
-                    Text(avatar.displayDescription)
-                        .font(.caption)
-                        .foregroundColor(.secondaryText)
+                    Spacer()
                     
-                    Text(avatar.theme)
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(6)
-                }
-                
-                Spacer()
-                
-                VStack(spacing: 6) {
-                    // start session button
-                    NavigationLink(destination: SessionView()) {
-                        ZStack{
-                            Rectangle()
-                                .foregroundColor(Color.primaryGreen)
-                                .frame(width: 90, height: 32)
-                                .cornerRadius(8)
-                            Text("start session")
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(.black)
+                    VStack(spacing: 6) {
+                        NavigationLink(destination: SessionView()) {
+                            HStack(alignment: .center, spacing: 8) {
+                                Image(systemName: "play.fill")
+                                    .foregroundColor(Color.black)
+                                Text("Start session")
+                                    .font(
+                                        Font.custom("SF Pro", size: 10)
+                                            .weight(.bold)
+                                    )
+                                .foregroundColor(.black)}
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.primaryGreen)
+                            .cornerRadius(4)
                         }
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    
-                    HStack(spacing: 4) {
-                        // edit button
-                        Button(action: {
-                            onEdit?()
-                        }) {
-                            ZStack{
-                                Rectangle()
-                                    .foregroundColor(Color.blue.opacity(0.1))
-                                    .frame(width: 42, height: 28)
-                                    .cornerRadius(6)
-                                Image(systemName: "pencil")
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
                         
-                        // delete button
-                        Button(action: {
-                            showingDeleteAlert = true
-                        }) {
-                            ZStack{
-                                Rectangle()
-                                    .foregroundColor(Color.red.opacity(0.1))
-                                    .frame(width: 42, height: 28)
-                                    .cornerRadius(6)
-                                Image(systemName: "trash")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 }
-            }
-            .padding(.horizontal, 20)
-        }
-        .alert("Delete Avatar", isPresented: $showingDeleteAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Delete", role: .destructive) {
-                onDelete?()
-            }
-        } message: {
-            Text("Are you sure you want to delete '\(avatar.name)'? This action cannot be undone.")
-        }
+                    .padding(.horizontal, 12)
+            )
     }
 }
 
+// Add this at the bottom of your EnhancedAvatarCard.swift file
+struct EnhancedAvatarCard_Previews: PreviewProvider {
+    static var previews: some View {
+        // Create a sample avatar
+        let sampleAvatar = Avatar(
+            id: 1,
+            name: "Sumi",
+            isDefault: true,
+            language: "English",
+            theme: "Calm",
+            voiceTone: "Ghibli",
+            profileImg: "sample_avatar",  // Make sure this image exists in your assets
+            deepfakeReady: true
+        )
+        
+        // Create a preview with the sample avatar
+        EnhancedAvatarCard(
+            avatar: sampleAvatar,
+            onStartSession: {
+                print("Start session tapped")
+            },
+            onEdit: {
+                print("Edit tapped")
+            },
+            onDelete: {
+                print("Delete tapped")
+            }
+        )
+        .previewLayout(.sizeThatFits)
+        .padding()
+        .background(Color.white) // Add background to see the card clearly
+    }
+}
