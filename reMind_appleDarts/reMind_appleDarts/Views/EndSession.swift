@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EndSessionView: View {
+    @State private var showSessionView = false
     var body: some View {
         ZStack {
             // Background gradient
@@ -27,7 +28,7 @@ struct EndSessionView: View {
                 HStack(spacing: 16) {
                     // Resume
                     Button(action: {
-                        // Resume action
+                        showSessionView = true
                     }) {
                         Text("Resume")
                             .fontWeight(.medium)
@@ -36,6 +37,10 @@ struct EndSessionView: View {
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(12)
                     }
+                    .fullScreenCover(isPresented: $showSessionView) {
+                        SessionView()
+                    }
+                    
 
                     // Finish
                     Button(action: {
@@ -51,7 +56,9 @@ struct EndSessionView: View {
                 }
             }
             .padding()
+            
         }
+        
     }
 }
 
