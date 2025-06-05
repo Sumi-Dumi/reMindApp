@@ -41,7 +41,9 @@ struct Break: View {
             Spacer()
         }
         .edgesIgnoringSafeArea(.all)
+        .navigationBarBackButtonHidden(true) 
     }
+    
 }
 
 struct Break_Previews: PreviewProvider {

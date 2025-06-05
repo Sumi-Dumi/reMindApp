@@ -1,11 +1,3 @@
-//
-//  SessionView.swift
-//  reMind_appleDarts
-//
-//  Created by ryosuke on 2/6/2025.
-//
-
-
 import SwiftUI
 import AVKit
 
@@ -15,18 +7,15 @@ struct BlobButtonStyle: ButtonStyle {
         ZStack {
             if configuration.isPressed {
                 BlobView(size: 100)
-
             } else {
                 Circle()
                     .fill(Color.black.opacity(0.4))
-                    
             }
             if !configuration.isPressed {
-                        configuration.label
-                            .foregroundColor(Color.primaryGreen)
-                                .frame(width: 40, height: 40)
-                        }
-
+                configuration.label
+                    .foregroundColor(Color.primaryGreen)
+                    .frame(width: 40, height: 40)
+            }
         }
         .frame(width: 100, height: 100)
     }
@@ -35,6 +24,7 @@ struct BlobButtonStyle: ButtonStyle {
 struct SessionView: View {
     @State private var currentStep: Int = 0
     @State private var recorded: Bool = false
+    @State private var navigateToBreak = false
 
     private var progress: Float {
         switch currentStep {
@@ -49,8 +39,6 @@ struct SessionView: View {
         }
     }
 
-   
-
     let prompts = [
         "Its OKAY, I Got U",
         "Now, What are 5 things you can SEE?",
@@ -60,102 +48,105 @@ struct SessionView: View {
         "Focus on 2 things you can SMELL?",
         "Now, Tell me 1 thing you can TASTE?"
     ]
-   
-    
-    var body: some View {
-        ZStack {
-            Color.gray.ignoresSafeArea()
-            
-            // Update this VideoView for different videos per step
-            VideoView()
-            
-            VStack {
-                // Progress Bars
-                HStack(spacing: 6) {
-                    ForEach(0..<5) { index in
-                        Capsule()
-                            .frame(height: 4)
-                            .foregroundColor(Float(index) < progress * 5 ? .white : .white.opacity(0.3))
-                    }
-                }
-                .padding(.top, 12)
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                // Dynamic Prompt Text
-                Text(prompts[currentStep])
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 24)
-                    .frame(width: 346, height: 64)
-                    .background(.black.opacity(0.4))
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(12)
-                    .multilineTextAlignment(.center)
-                
-                Spacer().frame(height: 80)
-                
-                // Mic + Controls
-                ZStack {
-                    RecordButton(recorded: $recorded)
-                    
-                    HStack {
-                        Button(action: {
-                            // Keyboard action
-                        }) {
-                            Image(systemName: "keyboard")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 28)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                        .padding(.leading, 24)
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 16) {
-                            Button(action: {
-                                // Delete action
-                                recorded = false
-                            }) {
-                                Image(systemName: "delete.left.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                                    .foregroundColor(.white)
-                            }
-                            
-                            Button(action: {
-                                if currentStep < prompts.count - 1 {
-                                    currentStep += 1
-                                    recorded = false
-                                }
-                            }) {
-                                Image(systemName: "checkmark")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 12, height: 12)
-                                    .foregroundColor(.black)
-                                    .padding(8)
-                                    .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                                    .clipShape(Circle())
-                            }
 
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.gray.ignoresSafeArea()
+                VideoView()
+
+                VStack {
+                    // Progress Bars
+                    HStack(spacing: 6) {
+                        ForEach(0..<5) { index in
+                            Capsule()
+                                .frame(height: 4)
+                                .foregroundColor(Float(index) < progress * 5 ? .white : .white.opacity(0.3))
                         }
                     }
-                    .padding(.horizontal, 40)
+                    .padding(.top, 12)
+                    .padding(.horizontal, 20)
+
+                    Spacer()
+
+                    // Prompt
+                    Text(prompts[currentStep])
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 24)
+                        .frame(width: 346, height: 64)
+                        .background(.black.opacity(0.4))
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(12)
+                        .multilineTextAlignment(.center)
+
+                    Spacer().frame(height: 80)
+
+                    // Mic + Controls
+                    ZStack {
+                        RecordButton(recorded: $recorded)
+
+                        HStack {
+                            Button(action: {
+                                // Keyboard action
+                            }) {
+                                Image(systemName: "keyboard")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 28, height: 28)
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            .padding(.leading, 24)
+
+                            Spacer()
+
+                            HStack(spacing: 16) {
+                                Button(action: {
+                                    recorded = false
+                                }) {
+                                    Image(systemName: "delete.left.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 24, height: 24)
+                                        .foregroundColor(.white)
+                                }
+
+                                Button(action: {
+                                    if currentStep < prompts.count - 1 {
+                                        currentStep += 1
+                                        recorded = false
+                                    } else {
+                                        navigateToBreak = true
+                                    }
+                                }) {
+                                    Image(systemName: "checkmark")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 12, height: 12)
+                                        .foregroundColor(.black)
+                                        .padding(8)
+                                        .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
+                                        .clipShape(Circle())
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 40)
+                    }
                 }
+
+                // Navigation Trigger
+                NavigationLink(destination: Break(), isActive: $navigateToBreak) {
+                                    EmptyView()
+                                }
+            
             }
         }
     }
 }
-
 
 struct SessionView_Previews: PreviewProvider {
     static var previews: some View {
         SessionView()
     }
 }
-
