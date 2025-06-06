@@ -104,7 +104,7 @@ struct MainView_Firebase: View {
                         LazyVStack(spacing: 12) {
                             ForEach(firebaseAvatarManager.firestoreAvatars, id: \.id) { firestoreAvatar in
                                 if firestoreAvatar.status == "ready" {
-                                    // Ready状態の場合はEnhancedAvatarCardを表示（Firebase対応版）
+                                    // if Ready
                                     EnhancedAvatarCard(
                                         avatar: firestoreAvatar.toLocalAvatar(),
                                         firestoreAvatar: firestoreAvatar,
@@ -186,101 +186,6 @@ struct MainView_Firebase: View {
     private func refreshView() {
         withAnimation(.easeInOut(duration: 0.3)) {
             refreshTrigger = UUID()
-        }
-    }
-}
-
-// Firebase用のAvatarCard（シンプル版）
-struct FirebaseAvatarCard: View {
-    let avatar: Avatar
-    let firestoreAvatar: FirestoreAvatar?
-    let onStartSession: () -> Void
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(Color.white.opacity(0.1))
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-            )
-            .frame(width: 380, height: 120)
-            .overlay(
-                HStack(spacing: 12) {
-                    // Image - Firebaseの画像URLを使用
-                    AsyncImage(url: URL(string: firestoreAvatar?.image_urls.first ?? "")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Image("sample_avatar")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                    .frame(width: 68, height: 72)
-                    .clipShape(Circle())
-                    
-                    // Text content
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text(firestoreAvatar?.creator_name ?? avatar.name)
-                                .font(.headline)
-                                .foregroundColor(.primaryText)
-                            
-                            // Firebase indicator
-                            Text("Web")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.blue)
-                                .cornerRadius(4)
-                        }
-                        
-                        if let firestoreAvatar = firestoreAvatar {
-                            Text("For: \(firestoreAvatar.recipient_name)")
-                                .font(.caption)
-                                .foregroundColor(.secondaryText)
-                            
-                            Text("\(firestoreAvatar.status.capitalized)")
-                                .font(.caption2)
-                                .foregroundColor(statusColor(firestoreAvatar.status))
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 6) {
-                        // Start session button
-                        NavigationLink(destination: SessionView()) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "play.fill")
-                                    .font(.system(size: 10))
-                                Text("Start")
-                                    .font(.system(size: 10, weight: .bold))
-                            }
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.primaryGreen)
-                            .cornerRadius(6)
-                        }
-                        .disabled(firestoreAvatar?.status != "ready")
-                    }
-                }
-                .padding(.horizontal, 12)
-            )
-    }
-    
-    private func statusColor(_ status: String) -> Color {
-        switch status.lowercased() {
-        case "ready":
-            return .green
-        case "processing":
-            return .orange
-        case "error":
-            return .red
-        default:
-            return .gray
         }
     }
 }
