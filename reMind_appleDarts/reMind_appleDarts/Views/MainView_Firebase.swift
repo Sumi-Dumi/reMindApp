@@ -16,11 +16,12 @@ struct MainView_Firebase: View {
     @State private var showingCreateView = false
     
     var body: some View {
+        NavigationView {
         ZStack{
             // Background
             BackGroundView()
             
-            NavigationView {
+
                 VStack(spacing: 15){
                     // User card with dynamic data
                     UserCard(
