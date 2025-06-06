@@ -28,7 +28,7 @@ struct FirestoreAvatar: Codable, Identifiable {
     func toLocalAvatar() -> Avatar {
         return Avatar(
             id: abs(id.hashValue), // idをIntに変換（正の値にする）
-            name: creator_name.isEmpty ? "Unknown" : creator_name,
+            name: recipient_name.isEmpty ? "Unknown" : recipient_name,
             isDefault: false, // Firestoreのデータにはdefault情報がないため
             language: "English", // デフォルト値
             theme: "Calm", // デフォルト値
