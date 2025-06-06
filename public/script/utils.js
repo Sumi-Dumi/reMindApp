@@ -25,24 +25,7 @@ export function showSuccessWithSharing(avatarId, creatorName, recipientName) {
   
   const successHtml = `
     <div style="text-align: center;">
-      <p style="color: #22c55e; margin: 0; font-weight: 600; font-size: 18px;">🎉 アバターが正常に作成されました！</p>
-      <p style="color: #16a34a; margin: 8px 0; font-size: 14px;">
-        ファイルがCloudinaryにアップロードされました ☁️<br>
-        メタデータがFirebaseに保存されました 🔥
-      </p>
-      
-      <div style="margin: 16px 0; padding: 16px; background: #f0f9e8; border-radius: 12px;">
-        <p style="margin: 0 0 8px 0; font-weight: 600; color: #16a34a;">📱 共有リンク:</p>
-        <input type="text" value="${shareUrl}" readonly style="width: 100%; padding: 8px; border: 1px solid #dcec7d; border-radius: 6px; margin: 4px 0;">
-        <button onclick="copyShareUrl('${shareUrl}')" style="background: #dcec7d; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 4px;">
-          リンクをコピー
-        </button>
-      </div>
-      
-      <div style="font-size: 12px; color: #888;">
-        <p style="margin: 2px 0;">アバター: ${avatarId}</p>
-        <p style="margin: 2px 0;">送信者: ${creatorName} → 受信者: ${recipientName}</p>
-      </div>
+
     </div>
   `;
   
@@ -56,7 +39,6 @@ export function copyShareUrl(url) {
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(url).then(() => {
       console.log('✅ リンクがクリップボードにコピーされました');
-      domManager.showTemporaryMessage('✅ リンクがクリップボードにコピーされました！');
     }).catch(() => {
       fallbackCopyToClipboard(url);
     });
@@ -77,9 +59,7 @@ function fallbackCopyToClipboard(text) {
   
   try {
     document.execCommand('copy');
-    domManager.showTemporaryMessage('✅ リンクがコピーされました！');
   } catch (err) {
-    domManager.showTemporaryMessage('❌ コピーに失敗しました');
   }
   
   document.body.removeChild(textArea);
@@ -124,12 +104,10 @@ export function getAppDebugInfo() {
 export function setupGlobalErrorHandling() {
   window.addEventListener('error', function(e) {
     console.error('💥 アプリケーションエラー:', e.error);
-    showError('予期しないエラーが発生しました。ページをリフレッシュしてください。');
   });
 
   window.addEventListener('unhandledrejection', function(e) {
     console.error('💥 未処理のPromise拒否:', e.reason);
-    showError('処理中にエラーが発生しました。もう一度お試しください。');
   });
 }
 

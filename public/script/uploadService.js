@@ -28,8 +28,8 @@ export class UploadService {
     } catch (error) {
       console.error('☁️ Cloudinaryアップロードに失敗:', error);
       // プログレス非表示
-      domManager.showProgress('image', false);
-      domManager.showProgress('audio', false);
+      // domManager.showProgress('image', false);
+      // domManager.showProgress('audio', false);
       throw error;
     }
   }
@@ -46,15 +46,15 @@ export class UploadService {
     const total = images.length;
     
     // プログレス表示開始
-    domManager.showProgress('image', true);
-    domManager.updateProgress('image', 0, '画像アップロードを開始しています...');
+    // domManager.showProgress('image', true);
+    // domManager.updateProgress('image', 0, '画像アップロードを開始しています...');
     
     try {
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         
         console.log(`📷 画像アップロード中 ${i + 1}/${total}: ${image.name}`);
-        domManager.updateProgress('image', (i / total) * 80, `画像 ${i + 1}/${total} をCloudinaryにアップロード中...`);
+        // domManager.updateProgress('image', (i / total) * 80, `画像 ${i + 1}/${total} をCloudinaryにアップロード中...`);
         
         const url = await this.uploadSingleImage(image, avatarId, i);
         urls.push(url);
@@ -63,10 +63,10 @@ export class UploadService {
         
         // プログレス更新
         const progress = ((i + 1) / total) * 100;
-        domManager.updateProgress('image', progress);
+        // domManager.updateProgress('image', progress);
       }
       
-      domManager.updateProgress('image', 100, `✅ ${total}枚の画像がアップロードされました！`);
+      // domManager.updateProgress('image', 100, `✅ ${total}枚の画像がアップロードされました！`);
       
       // プログレス非表示（遅延）
       setTimeout(() => {
@@ -146,8 +146,8 @@ export class UploadService {
     }
 
     // プログレス表示開始
-    domManager.showProgress('audio', true);
-    domManager.updateProgress('audio', 25, 'Cloudinaryに音声をアップロード中...');
+    // domManager.showProgress('audio', true);
+    // domManager.updateProgress('audio', 25, 'Cloudinaryに音声をアップロード中...');
     
     try {
       console.log(`🎵 音声アップロード中: ${(audioBlob.size / 1024 / 1024).toFixed(2)}MB`);
@@ -159,7 +159,7 @@ export class UploadService {
       formData.append('folder', 'remind_avatars');
       formData.append('resource_type', 'video'); // 音声はvideoリソースタイプ
       
-      domManager.updateProgress('audio', 50, '音声データを送信中...');
+      // domManager.updateProgress('audio', 50, '音声データを送信中...');
       
       // タイムアウト設定付きのfetch
       const controller = new AbortController();
@@ -175,7 +175,7 @@ export class UploadService {
       );
       
       clearTimeout(timeoutId);
-      domManager.updateProgress('audio', 75, '音声処理中...');
+      // domManager.updateProgress('audio', 75, '音声処理中...');
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -185,14 +185,14 @@ export class UploadService {
       
       const result = await response.json();
       
-      domManager.updateProgress('audio', 100, '✅ 音声がアップロードされました！');
+      // domManager.updateProgress('audio', 100, '✅ 音声がアップロードされました！');
       
       console.log(`✅ 音声アップロード完了: ${result.secure_url}`);
       
-      // プログレス非表示（遅延）
-      setTimeout(() => {
-        domManager.showProgress('audio', false);
-      }, 2000);
+      // // プログレス非表示（遅延）
+      // setTimeout(() => {
+      //   domManager.showProgress('audio', false);
+      // }, 2000);
       
       return result.secure_url;
       
@@ -204,7 +204,7 @@ export class UploadService {
         console.log(`🔄 音声を再試行中... (${attempt + 2}/${this.maxRetries + 1})`);
         
         // プログレスリセット
-        domManager.updateProgress('audio', 10, `再試行中... (${attempt + 2}/${this.maxRetries + 1})`);
+        // domManager.updateProgress('audio', 10, `再試行中... (${attempt + 2}/${this.maxRetries + 1})`);
         
         // 指数バックオフでリトライ
         const delay = Math.pow(2, attempt) * 1000;
@@ -213,7 +213,7 @@ export class UploadService {
         return this.uploadAudio(avatarId, attempt + 1);
       }
       
-      domManager.showProgress('audio', false);
+      // domManager.showProgress('audio', false);
       throw new Error(`音声のアップロードに失敗しました: ${error.message}`);
     }
   }
