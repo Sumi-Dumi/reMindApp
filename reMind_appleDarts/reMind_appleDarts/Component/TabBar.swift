@@ -54,13 +54,13 @@ struct MainTabView: View {
 
                     // Simulated top padding for the tab bar
                     Rectangle()
-                        .fill(Color.white.opacity(0.5))
+                        .fill(Color.white.opacity(1))
                         .frame(height: 12)
 
                     // Actual tab bar background
                     Rectangle()
-                        .fill(Color.white.opacity(0.5))
-                        .frame(height: 88)
+                        .fill(Color.clear)
+                        .frame(height: 82)
                 }
                 .edgesIgnoringSafeArea(.bottom)
 
@@ -68,21 +68,14 @@ struct MainTabView: View {
                 VStack(spacing: 0) {
                     Spacer()
 
-                    // Optional triangle visual (comment if not needed)
-                    Triangle()
-                        .fill(Color.white.opacity(0.5))
-                        .frame(width: 20, height: 10)
-                        .rotationEffect(.degrees(180))
-                        .offset(y: -10)
-
                     Button(action: {
                         navigateToSession = true
                     }) {
-                        Image("Breathe")
+                        Image("blobicon")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 70)
-                            .shadow(radius: 5)
+//                            .shadow(radius: 5)
                     }
                     .offset(y: -20)
                 }
