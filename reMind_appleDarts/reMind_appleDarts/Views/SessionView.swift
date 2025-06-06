@@ -241,12 +241,15 @@ struct SessionView: View {
                     }
                     .padding(.bottom, 24)
                 }
+                
 
                 NavigationLink(destination: Break(), isActive: $navigateToBreak) {
                     EmptyView()
                 }
+                
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
