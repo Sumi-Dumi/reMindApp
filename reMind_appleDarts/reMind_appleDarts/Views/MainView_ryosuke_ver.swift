@@ -10,7 +10,7 @@ struct MainView_ryosuke_ver: View {
             // Background
             BackGroundView()
             
-            NavigationView {
+//            NavigationView {
                 VStack(spacing: 15){
                     // User card with dynamic data
                     UserCard(
@@ -76,7 +76,7 @@ struct MainView_ryosuke_ver: View {
                     
                     Spacer()
                 }
-            }
+//            }
         }
         .sheet(item: $editingAvatar) { avatar in
             EditAvatarView(avatar: avatar)
