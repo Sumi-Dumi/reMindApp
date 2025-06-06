@@ -2,13 +2,13 @@ import SwiftUI
 
 struct PendingCard: View {
     let avatarName: String // Name user filled in before submission
-    
+
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .fill(Color.white.opacity(0.1))
+            .fill(Color.white.opacity(0.5))
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(red: 184/255, green: 192/255, blue: 204/255), lineWidth: 1)
+                    .stroke(Color.black.opacity(0.3), lineWidth: 0.5)
             )
             .frame(width: 380, height: 120)
             .overlay(
@@ -22,18 +22,18 @@ struct PendingCard: View {
                             .foregroundColor(.white)
                             .font(.system(size: 28, weight: .medium))
                     }
-                    
+
                     // Text content
                     VStack(alignment: .leading, spacing: 6) {
                         Text(avatarName)
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold)) //  Updated to 20pt
                             .foregroundColor(.black)
-                        
-                        Text("Almost there!, waiting for approval...")
-                            .font(.system(size: 12))
+
+                        Text("Almost there! Waiting for approval...")
+                            .font(.system(size: 14)) // Updated to 14pt
                             .foregroundColor(Color(red: 0.39, green: 0.45, blue: 0.55))
                     }
-                    
+
                     Spacer()
                 }
                 .padding(.horizontal, 16)
