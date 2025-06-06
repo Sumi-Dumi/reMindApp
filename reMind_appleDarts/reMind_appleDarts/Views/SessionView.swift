@@ -119,7 +119,7 @@ struct SessionView: View {
                         .padding(.horizontal, 24)
                         .frame(width: 346, height: 64)
                         .background(.black.opacity(0.4))
-                        .background(.ultraThinMaterial)
+//                        .background(.ultraThinMaterial)
                         .cornerRadius(12)
                         .multilineTextAlignment(.center)
 
@@ -134,7 +134,7 @@ struct SessionView: View {
                         })
                         .padding()
                         .frame(width: 346, height: 64)
-                        .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
+                        .background(RoundedRectangle(cornerRadius: 12))
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1))
                         .foregroundColor(.black)
                         
@@ -173,7 +173,7 @@ struct SessionView: View {
                                     .padding(.vertical, 26.66667)
                                     .frame(width: 100, height: 100)
                                     .background(Color.black.opacity(0.4))
-                                    .background(.ultraThinMaterial)
+//                                    .background(.ultraThinMaterial)
                                     .cornerRadius(100)
                             }
                         } else {
