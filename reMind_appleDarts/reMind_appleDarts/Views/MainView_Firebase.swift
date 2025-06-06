@@ -103,7 +103,7 @@ struct MainView_Firebase: View {
                         LazyVStack(spacing: 12) {
                             ForEach(firebaseAvatarManager.firestoreAvatars, id: \.id) { firestoreAvatar in
                                 if firestoreAvatar.status == "ready" {
-                                    // Ready状態の場合はEnhancedAvatarCardを表示
+                                    // if Ready
 //                                    FirebaseAvatarCard(
 //                                        avatar: firestoreAvatar.toLocalAvatar(),
 //                                        firestoreAvatar: firestoreAvatar,
@@ -116,7 +116,7 @@ struct MainView_Firebase: View {
 //                                        removal: .opacity.combined(with: .scale(scale: 0.8))
 //                                    ))
                                 } else {
-                                    // Ready以外の状態の場合はPendingCardを表示
+                                    // else pending
                                     PendingCard(avatarName: firestoreAvatar.recipient_name)
                                         .transition(.asymmetric(
                                             insertion: .opacity.combined(with: .slide),
