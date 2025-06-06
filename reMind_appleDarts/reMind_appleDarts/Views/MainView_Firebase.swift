@@ -29,8 +29,6 @@ struct MainView_Firebase: View {
                         avatarImageName: appViewModel.userProfileImage
                     )
                     
-                    Spacer()
-                    
                     // Add button and heading of List
                     HStack {
                         Text("Your support circle")
@@ -62,9 +60,7 @@ struct MainView_Firebase: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 0)
-
+                    .padding()
                     
                     // Error message
                     if !firebaseAvatarManager.errorMessage.isEmpty {
