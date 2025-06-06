@@ -27,7 +27,7 @@ struct MainView_ryosuke_ver: View {
                         
                         HStack(spacing: 12) {
                             // Add avatar button - NavigationLink
-                            NavigationLink(destination: CreateAvatarView()
+                            NavigationLink(destination: RequestConsentView()
                                 .environmentObject(appViewModel)
                                 .onDisappear {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
