@@ -152,18 +152,17 @@ struct RequestConsentView: View {
             "id": avatarId,
             "recipient_name": recipientName,
             "creator_name": creatorName,
-            "image_urls": [], // 空の配列（画像未設定）
-            "audio_url": "", // 空の文字列（音声未設定）
+            "image_urls": [],
+            "audio_url": "",
             "image_count": 0,
             "audio_size_mb": "0",
             "storage_provider": "cloudinary",
-            "status": "not_ready", // not_ready状態
+            "status": "not_ready",
             "created_at": Timestamp(date: Date()),
             "updated_at": Timestamp(date: Date()),
-            // 追加のメタデータ
             "instructions": "Please upload your photos and record a voice message to complete this avatar",
             "requested_by": creatorName,
-            "completion_percentage": 0, // 0%完了
+            "completion_percentage": 0, 
             "required_images": 3,
             "required_audio": true,
             "avatar_type": "consent_requested"
