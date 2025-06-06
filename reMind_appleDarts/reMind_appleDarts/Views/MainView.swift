@@ -7,7 +7,7 @@ struct MainView: View {
         ZStack {
             BackGroundView()
 
-            NavigationView {
+//            NavigationView {
                 VStack(spacing: 15) {
                     
                     UserCard(
@@ -50,7 +50,7 @@ struct MainView: View {
 
                     Spacer()
                 }
-            }
+//            }
         }
     }
 }
