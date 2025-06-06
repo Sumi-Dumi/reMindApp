@@ -1,9 +1,18 @@
 import SwiftUI
 import UIKit
+import FirebaseFirestore
 
 struct RequestConsentView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     @State private var showingShareSheet = false
     @State private var recipientName: String = ""
+    @State private var isCreating = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var alertTitle = ""
+    @State private var createdShareURL: String?
+    
+    private var db = Firestore.firestore()
 
     var body: some View {
         VStack(spacing: 20) {
@@ -37,13 +46,19 @@ struct RequestConsentView: View {
                 )
                 .foregroundColor(.black)
 
-
             Button(action: {
-                showingShareSheet = true
+                createAvatarInFirestore()
             }) {
                 HStack {
-                    Text("Send Request")
-                    Image(systemName: "arrow.right")
+                    if isCreating {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                            .foregroundColor(.black)
+                    }
+                    Text(isCreating ? "Creating..." : "Send Request")
+                    if !isCreating {
+                        Image(systemName: "arrow.right")
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -51,10 +66,10 @@ struct RequestConsentView: View {
                 .foregroundColor(.black)
                 .cornerRadius(15)
                 .font(.headline)
-                .opacity(recipientName.isEmpty ? 0.3 : 1.0)
+                .opacity((recipientName.isEmpty || isCreating) ? 0.3 : 1.0)
             }
             .padding(.horizontal, 30)
-            .disabled(recipientName.isEmpty)
+            .disabled(recipientName.isEmpty || isCreating)
 
             Spacer()
         }
@@ -68,14 +83,124 @@ struct RequestConsentView: View {
         )
         .sheet(isPresented: $showingShareSheet) {
             ActivityView(activityItems: [
-                URL(string: "https://example.com/invite")!,
-                "Hey! Please join me on this app 💛"
+                createdShareURL != nil ? URL(string: createdShareURL!)! : URL(string: "https://remind-f54ef.web.app/")!,
+                "Hey \(recipientName)! Please create an avatar for me on reMind app 💛"
             ])
+        }
+        .alert(alertTitle, isPresented: $showAlert) {
+            Button("OK") {
+                if alertTitle == "Success!" {
+                    showingShareSheet = true
+                }
+            }
+        } message: {
+            Text(alertMessage)
+        }
+    }
+    
+    // MARK: - Firestore Avatar Creation
+    private func createAvatarInFirestore() {
+        guard !recipientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+        
+        isCreating = true
+        
+        // ユニークなアバターIDを生成
+        let avatarId = generateAvatarId()
+        
+        // 現在のユーザー情報を取得
+        let currentUserName = appViewModel.userDisplayName
+        
+        // Firestoreのavatarsコレクションに保存するデータ
+        let avatarData = createBlankAvatarData(
+            avatarId: avatarId,
+            recipientName: recipientName.trimmingCharacters(in: .whitespacesAndNewlines),
+            creatorName: currentUserName
+        )
+        
+        // Firestoreに保存
+        db.collection("avatars").document(avatarId).setData(avatarData) { [self] error in
+            DispatchQueue.main.async {
+                isCreating = false
+                
+                if let error = error {
+                    print("❌ Firestore保存エラー: \(error.localizedDescription)")
+                    alertTitle = "Error"
+                    alertMessage = "Fail to create avatar. Please try again later."
+                    showAlert = true
+                } else {
+                    print("✅ アバターがFirestoreに作成されました: \(avatarId)")
+                    
+                    // 共有URLを設定（アバター作成ページ）
+                    createdShareURL = "https://remind-f54ef.web.app/create/\(avatarId)"
+                    
+                    alertTitle = "Success!"
+                    alertMessage = "Send UrL to \(recipientName)!"
+                    showAlert = true
+                    
+                    // ローカルにもpending状態のアバターを追加
+                    addPendingAvatarLocally(avatarId: avatarId)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Avatar Data Creation Function
+    private func createBlankAvatarData(avatarId: String, recipientName: String, creatorName: String) -> [String: Any] {
+        return [
+            "id": avatarId,
+            "recipient_name": recipientName,
+            "creator_name": creatorName,
+            "image_urls": [], // 空の配列（画像未設定）
+            "audio_url": "", // 空の文字列（音声未設定）
+            "image_count": 0,
+            "audio_size_mb": "0",
+            "storage_provider": "cloudinary",
+            "status": "not_ready", // not_ready状態
+            "created_at": Timestamp(date: Date()),
+            "updated_at": Timestamp(date: Date()),
+            // 追加のメタデータ
+            "instructions": "Please upload your photos and record a voice message to complete this avatar",
+            "requested_by": creatorName,
+            "completion_percentage": 0, // 0%完了
+            "required_images": 3,
+            "required_audio": true,
+            "avatar_type": "consent_requested"
+        ]
+    }
+    
+    // MARK: - Local Avatar Addition
+    private func addPendingAvatarLocally(avatarId: String) {
+        // ローカルのAvatarマネージャーにpending状態のアバターを追加
+        let pendingAvatar = Avatar(
+            id: abs(avatarId.hashValue),
+            name: recipientName.trimmingCharacters(in: .whitespacesAndNewlines),
+            isDefault: false,
+            language: "English",
+            theme: "Pending",
+            voiceTone: "Not Set",
+            profileImg: "sample_avatar",
+            deepfakeReady: false // not_ready状態なのでfalse
+        )
+        
+        appViewModel.avatarManager.addAvatar(pendingAvatar)
+        print("📱 ローカルにpendingアバターを追加: \(pendingAvatar.name)")
+    }
+    
+    // MARK: - Helper Functions
+    private func generateAvatarId() -> String {
+        return "avatar_\(Date().timeIntervalSince1970)_\(Int.random(in: 1000...9999))"
+    }
+    
+    // MARK: - Debug Function
+    private func printAvatarData(_ data: [String: Any]) {
+        print("🔍 作成されるアバターデータ:")
+        for (key, value) in data {
+            print("  - \(key): \(value)")
         }
     }
 }
-
-
 
 struct ActivityView: UIViewControllerRepresentable {
     let activityItems: [Any]
@@ -91,4 +216,5 @@ struct ActivityView: UIViewControllerRepresentable {
 
 #Preview {
     RequestConsentView()
+        .environmentObject(AppViewModel())
 }

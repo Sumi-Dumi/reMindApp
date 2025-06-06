@@ -101,27 +101,11 @@ struct MainView_Firebase: View {
                     // List for supporter
                     ScrollView {
                         LazyVStack(spacing: 12) {
-                            // ローカルアバター表示
-                            ForEach(getCurrentLocalAvatars(), id: \.id) { avatar in
-                                EnhancedAvatarCard(
-                                    avatar: avatar,
-                                    onStartSession: {
-                                        print("\(avatar.name) session started!")
-                                    }
-                                )
-                                .transition(.asymmetric(
-                                    insertion: .opacity.combined(with: .slide),
-                                    removal: .opacity.combined(with: .scale(scale: 0.8))
-                                ))
-                            }
                             
                             // Firebaseアバター表示
                             ForEach(firebaseAvatarManager.avatars, id: \.id) { avatar in
-                                FirebaseAvatarCard(
+                                EnhancedAvatarCard(
                                     avatar: avatar,
-                                    firestoreAvatar: firebaseAvatarManager.firestoreAvatars.first {
-                                        abs($0.id.hashValue) == avatar.id
-                                    },
                                     onStartSession: {
                                         print("Firebase \(avatar.name) session started!")
                                     }
