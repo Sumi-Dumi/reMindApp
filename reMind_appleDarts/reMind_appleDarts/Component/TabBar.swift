@@ -2,72 +2,76 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @State private var navigateToSession = false
 
     var body: some View {
-        ZStack {
-            // Main content
-            TabView(selection: $selectedTab) {
-                MainView()
-                    .tag(0)
-                    .tabItem {
-                        Image(systemName: "house.fill")
-                        Text("Home")
-                    }
+        NavigationStack {
+            ZStack {
+                // Main content
+                TabView(selection: $selectedTab) {
+                    MainView_Firebase()
+                        .environmentObject(AppViewModel())
+                        .tag(0)
+                        .tabItem {
+                            Image(systemName: "house.fill")
+                            Text("Home")
+                        }
 
-                PulsingView()
-                    .tag(1)
-                    .tabItem {
-                        Image(systemName: "face.smiling.fill")
-                        Text("Avatars")
-                    }
-                ContentView()
-                    .tag(3)
-                    .tabItem {
-//                        Image(systemName: "questionmark.circle")
-//                        Text("Help")
-                    }
+                    MainView_Firebase()
+                        .environmentObject(AppViewModel())
+                        .tag(1)
+                        .tabItem {
+                            Image(systemName: "face.smiling.fill")
+                            Text("Avatars")
+                        }
 
-                MainView()
-                    .tag(2)
-                    .tabItem {
-                        // Dummy tab for center button
-                        Image(systemName: "person.fill").opacity(0)
-                        Text("Profile").opacity(0)
-                    }
-               
-                ContentView()
-                    .tag(3)
-                    .tabItem {
-                        Image(systemName: "questionmark.circle")
-                        Text("Help")
-                    }
-            }
+                    // Dummy tab for center button – hidden but needed to preserve spacing
+                    Text("") // Or use EmptyView() if preferred
+                        .tag(2)
+                        
+                        
 
-            // Floating center button
-            VStack {
-                Spacer()
-                HStack {
+                    EditUserView()
+                        .tag(3)
+                        .tabItem {
+                            Image(systemName: "person.fill")
+                            Text("Profile")
+                        }
+
+                    ContentView()
+                        .tag(4)
+                        .tabItem {
+                            Image(systemName: "questionmark.circle")
+                            Text("Help")
+                        }
+                }
+
+                // Floating center button (over tab 2)
+                VStack {
                     Spacer()
-
-                    // Add more space before and after the button
                     HStack {
-                        Spacer().frame(width: UIScreen.main.bounds.width / 4.2) // ⬅️ More spacing before button
+                        Spacer()
 
                         Button(action: {
-                            selectedTab = 2
+                            navigateToSession = true
                         }) {
                             Image("Breathe")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 70)
+                                .shadow(radius: 5)
                         }
                         .offset(y: -20)
 
-                        Spacer().frame(width: UIScreen.main.bounds.width / 4.2) // ⬅️ More spacing after button
+                        Spacer()
                     }
-
-                    Spacer()
                 }
+
+                // Navigation to SessionView
+                NavigationLink(destination: SessionView(), isActive: $navigateToSession) {
+                    EmptyView()
+                }
+                .hidden()
             }
         }
     }
