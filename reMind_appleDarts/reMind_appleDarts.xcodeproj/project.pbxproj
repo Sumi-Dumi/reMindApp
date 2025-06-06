@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		77446A8B2DF26A4F00494995 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 77446A8A2DF26A4F00494995 /* FirebaseAuth */; };
 		77446A8D2DF26A4F00494995 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 77446A8C2DF26A4F00494995 /* FirebaseFirestore */; };
+		77446A8F2DF26A8100494995 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 77446A8E2DF26A8100494995 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		77446A8E2DF26A8100494995 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A43371542DE9409B00FAFAED /* reMind_appleDarts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = reMind_appleDarts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -41,6 +43,7 @@
 			children = (
 				A43371562DE9409B00FAFAED /* reMind_appleDarts */,
 				A43371552DE9409B00FAFAED /* Products */,
+				77446A8E2DF26A8100494995 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,6 +124,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77446A8F2DF26A8100494995 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

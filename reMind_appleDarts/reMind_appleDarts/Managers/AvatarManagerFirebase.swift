@@ -1,11 +1,4 @@
 //
-//  AvatarManagerFirebase.swift
-//  reMind_appleDarts
-//
-//  Created by ryosuke on 6/6/2025.
-//
-
-//
 //  FirebaseAvatarManager.swift
 //  reMind_appleDarts
 //
