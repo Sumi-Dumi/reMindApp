@@ -37,7 +37,7 @@ struct CustomVideoPlayerView: UIViewControllerRepresentable {
 }
 
 struct VideoView: View {
-    @State var player = AVPlayer(url: Bundle.main.url(forResource: "sample_video", withExtension: "mp4")!)
+    @State var player = AVPlayer(url: Bundle.main.url(forResource: "Grandma part 1", withExtension: "mp4")!)
 
     var body: some View {
         CustomVideoPlayerView(player: player)
