@@ -2,7 +2,10 @@ import SwiftUI
 
 struct RegisterView: View {
     @State private var isRegistered = false
-    @State private var dummyText = "" 
+    @State private var name = ""
+    @State private var email = ""
+    @State private var password = ""
+    @State private var isPasswordVisible = false
 
     var body: some View {
         NavigationStack {
@@ -20,26 +23,62 @@ struct RegisterView: View {
                         .font(.subheadline)
                         .foregroundColor(.gray)
 
-                    // Dummy Input UI (not actually used)
                     VStack(alignment: .leading, spacing: 16) {
-                        ForEach(["Name", "Email", "Password"], id: \.self) { label in
-                            VStack(alignment: .leading) {
-                                Text(label)
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                                Group {
-                                    if label == "Password" {
-                                        SecureField(label, text: $dummyText)
-                                    } else {
-                                        TextField(label, text: $dummyText)
-                                    }
-                                }
+                        VStack(alignment: .leading) {
+                            Text("Name")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            TextField("Name", text: $name)
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(8)
                                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
-                            }
                         }
+
+                        VStack(alignment: .leading) {
+                            Text("Email")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            TextField("Email", text: $email)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
+                        }
+
+                        VStack(alignment: .leading) {
+                            Text("Password")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            
+
+                            HStack {
+                                Group {
+                                    if isPasswordVisible {
+                                        TextField("Password", text: $password)
+                                    } else {
+                                        SecureField("Password", text: $password)
+                                    }
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.leading, 16)
+
+                                Button(action: {
+                                    isPasswordVisible.toggle()
+                                }) {
+                                    Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.trailing, 16)
+                            }
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.3))
+                            )
+                        }
+
                     }
                     .padding(.horizontal, 30)
 
