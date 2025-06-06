@@ -20,7 +20,7 @@ struct MainView_Firebase: View {
             // Background
             BackGroundView()
             
-//            NavigationView {
+            NavigationView {
                 VStack(spacing: 15){
                     // User card with dynamic data
                     UserCard(
@@ -38,8 +38,8 @@ struct MainView_Firebase: View {
                         Spacer()
                         
                         HStack(spacing: 12) {
-                            // Add avatar button (既存のローカル作成)
-                            NavigationLink(destination: CreateAvatarView()
+                            // Add avatar button
+                            NavigationLink(destination: RequestConsentView()
                                 .environmentObject(appViewModel)
                                 .onDisappear {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -101,20 +101,31 @@ struct MainView_Firebase: View {
                     // List for supporter
                     ScrollView {
                         LazyVStack(spacing: 12) {
-                            
-                            // Firebaseアバター表示
-                            ForEach(firebaseAvatarManager.avatars, id: \.id) { avatar in
-                                EnhancedAvatarCard(
-                                    avatar: avatar,
-                                    onStartSession: {
-                                        print("Firebase \(avatar.name) session started!")
+                            ForEach(firebaseAvatarManager.firestoreAvatars, id: \.id) { firestoreAvatar in
+                                if firestoreAvatar.status == "ready" {
+                                    //if Ready, EnhancedAvatarCard
+                                    ForEach(firebaseAvatarManager.avatars, id: \.id) { avatar in
+                                        EnhancedAvatarCard(
+                                            avatar: avatar,
+                                            onStartSession: {
+                                                print("Firebase \(avatar.name) session started!")
+                                            }
+                                        )
+                                        .transition(.asymmetric(
+                                            insertion: .opacity.combined(with: .slide),
+                                            removal: .opacity.combined(with: .scale(scale: 0.8))
+                                        ))
                                     }
-                                )
-                                .transition(.asymmetric(
-                                    insertion: .opacity.combined(with: .slide),
-                                    removal: .opacity.combined(with: .scale(scale: 0.8))
-                                ))
+                                } else {
+                                    // else PendingCard
+                                    PendingCard(avatarName: firestoreAvatar.recipient_name)
+                                        .transition(.asymmetric(
+                                            insertion: .opacity.combined(with: .slide),
+                                            removal: .opacity.combined(with: .scale(scale: 0.8))
+                                        ))
+                                }
                             }
+                            
                             
                             // Empty state
                             if getCurrentLocalAvatars().isEmpty &&
@@ -132,7 +143,7 @@ struct MainView_Firebase: View {
                     
                     Spacer()
                 }
-//            }
+            }
         }
         .sheet(isPresented: $showingCreateView) {
             CreateAvatarView()
