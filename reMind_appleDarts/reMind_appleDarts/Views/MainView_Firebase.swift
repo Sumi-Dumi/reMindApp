@@ -20,7 +20,7 @@ struct MainView_Firebase: View {
             // Background
             BackGroundView()
             
-            NavigationView {
+//            NavigationView {
                 VStack(spacing: 15){
                     // User card with dynamic data
                     UserCard(
@@ -148,7 +148,7 @@ struct MainView_Firebase: View {
                     
                     Spacer()
                 }
-            }
+//            }
         }
         .sheet(isPresented: $showingCreateView) {
             CreateAvatarView()
