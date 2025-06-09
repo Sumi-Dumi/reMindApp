@@ -1,7 +1,7 @@
 import SwiftUI
+import FirebaseFirestore
 
 struct EditAvatarView: View {
-    @EnvironmentObject var appViewModel: AppViewModel
     @Environment(\.presentationMode) var presentationMode
     
     let originalAvatar: Avatar
@@ -19,11 +19,11 @@ struct EditAvatarView: View {
     @State private var showingDiscardAlert = false
     @State private var showingDeleteAlert = false
     
+    private var db = Firestore.firestore()
 
     private let languages = ["English", "Japanese", "Spanish", "French", "German", "Italian"]
-    private let themes = ["Calm", "Energetic", "Peaceful", "Motivational", "Relaxing", "Cheerful"]
+    private let themes = ["Human", "Ghibli"]
     private let voiceTones = ["Gentle", "Soft", "Medium", "Warm", "Clear", "Soothing"]
-    private let profileImages = ["sample_avatar", "avatar_1", "avatar_2", "avatar_3", "avatar_4"]
     
     init(avatar: Avatar) {
         self.originalAvatar = avatar
@@ -45,8 +45,14 @@ struct EditAvatarView: View {
     }
     
     private var isFormValid: Bool {
-        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
-        return validation.isValid
+        let trimmedName = avatarName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.isEmpty {
+            return false
+        }
+        if trimmedName.count > 30 {
+            return false
+        }
+        return true
     }
     
     var body: some View {
@@ -56,9 +62,6 @@ struct EditAvatarView: View {
                 
                 ScrollView {
                     VStack(spacing: 30) {
-                        
-                        
-                        
                         headerSection
                         
                         formFieldsSection
@@ -101,14 +104,11 @@ struct EditAvatarView: View {
             Button("Discard", role: .destructive) {
                 presentationMode.wrappedValue.dismiss()
             }
-        } message: {
-            Text("You have unsaved changes. Are you sure you want to discard them?")
         }
         .onChange(of: avatarName) { _ in
             validateForm()
         }
     }
-    
     
     private var headerSection: some View {
         VStack(spacing: 20) {
@@ -117,8 +117,6 @@ struct EditAvatarView: View {
                     Text("Edit Avatar")
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.primaryText)
-
-                    
 
                     Button(action: {
                         showingDeleteAlert = true
@@ -130,19 +128,31 @@ struct EditAvatarView: View {
                     .padding(.trailing, 5)
                 }
 
-                    Text("Design your personal support companion")
-                        .font(.subheadline)
-                        .foregroundColor(.secondaryText)
-                
-                
+                Text("Design your personal support companion")
+                    .font(.subheadline)
+                    .foregroundColor(.secondaryText)
             }
 
-                Image("userProfile")
+            if let imageUrl = originalAvatar.image_urls.first, !imageUrl.isEmpty {
+                AsyncImage(url: URL(string: imageUrl)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Image("sample_avatar")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
+                .frame(width: 100, height: 100)
+                .clipShape(Circle())
+            } else {
+                Image("sample_avatar")
                     .resizable()
                     .frame(width: 100, height: 100)
                     .clipShape(Circle())
             }
         }
+    }
     
     private var formFieldsSection: some View {
         VStack(spacing: 20) {
@@ -223,32 +233,12 @@ struct EditAvatarView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(isDefault ? Color.primaryGreen.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
             )
-            
-            if originalAvatar.isDefault && !isDefault && appViewModel.avatarCount > 1 {
-                Text("⚠️ Removing default status will make another avatar the default")
-                    .font(.caption)
-                    .foregroundColor(.orange)
-                    .padding(.horizontal, 8)
-            }
         }
         .padding(.horizontal, 30)
     }
     
     private var actionButtonsSection: some View {
         VStack(spacing: 16) {
-            if hasChanges {
-                HStack {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundColor(.orange)
-                    Text("You have unsaved changes")
-                        .font(.subheadline)
-                        .foregroundColor(.orange)
-                }
-                .padding()
-                .background(Color.orange.opacity(0.1))
-                .cornerRadius(8)
-            }
-            
             HStack(spacing: 16) {
                 Button(action: {
                     if hasChanges {
@@ -335,56 +325,96 @@ struct EditAvatarView: View {
     }
     
     private func validateForm() {
-        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName, excludingId: originalAvatar.id)
-        validationMessage = validation.isValid ? "" : validation.message
+        let trimmedName = avatarName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.isEmpty {
+            validationMessage = "Avatar name cannot be empty"
+        } else if trimmedName.count > 30 {
+            validationMessage = "Avatar name must be 30 characters or less"
+        } else {
+            validationMessage = ""
+        }
     }
+    
     private func deleteAvatar() {
-        appViewModel.avatarManager.deleteAvatar(withId: originalAvatar.id)
-        presentationMode.wrappedValue.dismiss()
+        guard let documentID = originalAvatar.documentID else {
+            print("❌ Document ID not found")
+            return
+        }
+        
+        db.collection("avatars").document(documentID).delete { error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    print("❌ Error deleting avatar: \(error)")
+                } else {
+                    print("✅ Avatar deleted successfully")
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
     }
-
-
     
     private func updateAvatar() {
-        let validation = appViewModel.avatarManager.validateAvatarData(name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines), excludingId: originalAvatar.id)
-        
-        if !validation.isValid {
-            validationMessage = validation.message
+        let trimmedName = avatarName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.isEmpty || trimmedName.count > 30 {
             return
         }
         
         isUpdating = true
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            let updatedAvatar = Avatar(
-                id: originalAvatar.id,
-                name: avatarName.trimmingCharacters(in: .whitespacesAndNewlines),
-                isDefault: isDefault,
-                language: selectedLanguage,
-                theme: selectedTheme,
-                voiceTone: selectedVoiceTone,
-                profileImg: selectedProfileImage,
-                deepfakeReady: originalAvatar.deepfakeReady
-            )
-            
-            appViewModel.avatarManager.updateAvatar(updatedAvatar)
+        let updateData: [String: Any] = [
+            "name": trimmedName,
+            "language": selectedLanguage,
+            "theme": selectedTheme,
+            "voiceTone": selectedVoiceTone,
+            "profileImg": selectedProfileImage,
+            "isDefault": isDefault,
+            "updated_at": Timestamp(date: Date())
+        ]
+        
+        guard let documentID = originalAvatar.documentID else {
+            print("❌ Document ID not found")
             isUpdating = false
-            showSuccessAlert = true
+            return
+        }
+        
+        db.collection("avatars").document(documentID).updateData(updateData) { error in
+            DispatchQueue.main.async {
+                isUpdating = false
+                
+                if let error = error {
+                    print("❌ Error updating avatar: \(error)")
+                    validationMessage = "Failed to update avatar. Please try again."
+                } else {
+                    print("✅ Avatar updated successfully")
+                    showSuccessAlert = true
+                }
+            }
         }
     }
 }
 
-
 #Preview {
-    EditAvatarView(avatar: Avatar(
-        id: 1,
+    let sampleAvatar = Avatar(
+        id: "avatar_12345",
         name: "Sample Avatar",
         isDefault: true,
         language: "English",
-        theme: "Calm",
+        theme: "Ghibli",
         voiceTone: "Gentle",
         profileImg: "sample_avatar",
-        deepfakeReady: true
-    ))
-    .environmentObject(AppViewModel())
+        deepfakeReady: true,
+        recipient_name: "Alice",
+        creator_name: "Bob",
+        image_urls: [],
+        audio_url: "",
+        image_count: 0,
+        audio_size_mb: "0",
+        storage_provider: "cloudinary",
+        status: "ready",
+        created_at: nil,
+        updated_at: nil,
+        deepfake_video_urls: []
+    )
+    
+    EditAvatarView(avatar: sampleAvatar)  
 }

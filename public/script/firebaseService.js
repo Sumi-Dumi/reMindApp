@@ -36,6 +36,35 @@ export class FirebaseService {
     }
   }
 
+    // updateExistingAvatar メソッドを追加
+  async updateExistingAvatar(avatarId, updateData) {
+    if (!this.initialized) {
+      throw new Error('Firebaseが初期化されていません');
+    }
+
+    try {
+      // avatarIdでドキュメントを検索
+      const querySnapshot = await firebase.firestore()
+        .collection('avatars')
+        .where('id', '==', avatarId)
+        .limit(1)
+        .get();
+
+      if (querySnapshot.empty) {
+        throw new Error('指定されたアバターが見つかりません');
+      }
+
+      const doc = querySnapshot.docs[0];
+      await doc.ref.update(updateData);
+      
+      console.log(`✅ アバター更新完了: ${avatarId}`);
+      return doc.id;
+    } catch (error) {
+      console.error('❌ アバター更新に失敗:', error);
+      throw new Error(`アバター更新に失敗しました: ${error.message}`);
+    }
+  }
+
   // メタデータをFirebaseに保存
   async saveMetadata(data) {
     if (!this.initialized) {

@@ -19,8 +19,6 @@ export class DOMManager {
       audioSection: document.querySelector('.mic-audio'),
       mainContainer: document.querySelector('.main'),
       mobileInterface: document.querySelector('.mobile-interface'),
-      recipientInput: document.getElementById('recipientName'),
-      creatorInput: document.getElementById('creatorName'),
       submitBtn: document.getElementById('submitBtn'),
       successMsg: document.getElementById('successMessage'),
       errorMsg: document.getElementById('errorMessage'),

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EndSessionView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     @State private var showSessionView = false
     @State private var showMainView = false
     var body: some View {
@@ -56,7 +57,8 @@ struct EndSessionView: View {
                             .cornerRadius(12)
                     }
                     .fullScreenCover(isPresented: $showMainView) {
-                        MainView()
+                        MainTabView()
+                            .environmentObject(appViewModel)
                     }
                 }
             }

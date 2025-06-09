@@ -3,6 +3,8 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var navigateToSession = false
+    @StateObject private var firebaseAvatarManager = FirebaseAvatarManager()
+    @EnvironmentObject var appViewModel: AppViewModel
 
     init() {
         // Set default tab bar appearance background to white (for fallback)
@@ -15,7 +17,7 @@ struct MainTabView: View {
                 // Main content
                 TabView(selection: $selectedTab) {
                     MainView_Firebase()
-                        .environmentObject(AppViewModel())
+                        .environmentObject(appViewModel)
                         .tag(0)
                         .tabItem {
                             Image(systemName: "house.fill")
@@ -23,7 +25,7 @@ struct MainTabView: View {
                         }
 
                     MainView_Firebase()
-                        .environmentObject(AppViewModel())
+                        .environmentObject(appViewModel)
                         .tag(1)
                         .tabItem {
                             Image(systemName: "face.smiling.fill")
@@ -34,6 +36,7 @@ struct MainTabView: View {
                     Text("").tag(2)
 
                     EditUserView()
+                        .environmentObject(appViewModel)
                         .tag(3)
                         .tabItem {
                             Image(systemName: "person.fill")
@@ -41,6 +44,7 @@ struct MainTabView: View {
                         }
 
                     ContentView()
+                        .environmentObject(appViewModel)
                         .tag(4)
                         .tabItem {
                             Image(systemName: "questionmark.circle")
@@ -81,12 +85,18 @@ struct MainTabView: View {
                 }
 
                 // Navigation to SessionView
-                NavigationLink(destination: SessionView(), isActive: $navigateToSession) {
+                NavigationLink(destination: SessionView(avatar: defaultAvatar), isActive: $navigateToSession) {
                     EmptyView()
                 }
                 .hidden()
             }
         }
+        .navigationBarBackButtonHidden(true)
+        
+    }
+        
+    private var defaultAvatar: Avatar? {
+        return firebaseAvatarManager.avatars.first { $0.isDefault && $0.status == "ready" }
     }
 }
 
@@ -104,4 +114,5 @@ struct Triangle: Shape {
 
 #Preview {
     MainTabView()
+        .environmentObject(AppViewModel())
 }

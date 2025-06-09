@@ -112,7 +112,7 @@ export class AudioHandler {
     `;
     
     this.recordingPopup.innerHTML = `
-      <div style="background: white; border-radius: 20px; padding: 40px; text-align: center; max-width: 400px;">
+      <div style="background: white; border-radius: 20px; padding: 40px; text-align: center; max-width: 380px;">
         <div style="width: 80px; height: 80px; background: #ef4444; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; animation: pulse 2s ease-in-out infinite;">
           <div style="width: 16px; height: 16px; background: white; border-radius: 50%;"></div>
         </div>

@@ -11,6 +11,7 @@ struct RequestConsentView: View {
     @State private var alertMessage = ""
     @State private var alertTitle = ""
     @State private var createdShareURL: String?
+    @State private var createdAvatarId: String?
     
     private var db = Firestore.firestore()
 
@@ -18,7 +19,7 @@ struct RequestConsentView: View {
         VStack(spacing: 20) {
             Spacer()
             
-            VStack (spacing: 12){
+            VStack(spacing: 12) {
                 Text("Request Consent")
                     .font(.title2.bold())
                     .foregroundColor(.primaryText)
@@ -30,7 +31,6 @@ struct RequestConsentView: View {
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 46)
-                
             }
             
             TextField("Enter recipient's Name...", text: $recipientName)
@@ -82,10 +82,7 @@ struct RequestConsentView: View {
             .ignoresSafeArea()
         )
         .sheet(isPresented: $showingShareSheet) {
-            ActivityView(activityItems: [
-                createdShareURL != nil ? URL(string: createdShareURL!)! : URL(string: "https://remind-f54ef.web.app/")!,
-                "Hey \(recipientName)! Please create an avatar for me on reMind app 💛"
-            ])
+            ActivityView(activityItems: createActivityItems())
         }
         .alert(alertTitle, isPresented: $showAlert) {
             Button("OK") {
@@ -98,7 +95,7 @@ struct RequestConsentView: View {
         }
     }
     
-    // MARK: - Firestore Avatar Creation
+    // MARK: - Firebase Avatar Creation
     private func createAvatarInFirestore() {
         guard !recipientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return
@@ -106,50 +103,61 @@ struct RequestConsentView: View {
         
         isCreating = true
         
-        // ユニークなアバターIDを生成
-        let avatarId = generateAvatarId()
+        let avatarId = generateUniqueAvatarId()
+        createdAvatarId = avatarId
         
-        // 現在のユーザー情報を取得
         let currentUserName = appViewModel.userDisplayName
+        let trimmedRecipientName = recipientName.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Firestoreのavatarsコレクションに保存するデータ
-        let avatarData = createBlankAvatarData(
+        let baseURL = "https://remind-f54ef.web.app"
+        let createURL = "\(baseURL)/?avatarId=\(avatarId)"
+        
+        let avatarData = createAvatarData(
             avatarId: avatarId,
-            recipientName: recipientName.trimmingCharacters(in: .whitespacesAndNewlines),
-            creatorName: currentUserName
+            recipientName: trimmedRecipientName,
+            creatorName: currentUserName,
+            createURL: createURL
         )
         
-        // Firestoreに保存
         db.collection("avatars").document(avatarId).setData(avatarData) { [self] error in
             DispatchQueue.main.async {
                 isCreating = false
                 
                 if let error = error {
-                    print("❌ Firestore保存エラー: \(error.localizedDescription)")
+                    print("❌ Firestore save error: \(error.localizedDescription)")
                     alertTitle = "Error"
-                    alertMessage = "Fail to create avatar. Please try again later."
+                    alertMessage = "Failed to create avatar. Please try again later."
                     showAlert = true
                 } else {
-                    print("✅ アバターがFirestoreに作成されました: \(avatarId)")
+                    print("✅ Avatar created in Firestore: \(avatarId)")
                     
-                    // 共有URLを設定（アバター作成ページ）
-                    createdShareURL = "https://remind-f54ef.web.app/create/\(avatarId)"
+                    createdShareURL = createURL
                     
                     alertTitle = "Success!"
-                    alertMessage = "Send UrL to \(recipientName)!"
+                    alertMessage = "Avatar created successfully! Send the URL to \(trimmedRecipientName)!"
                     showAlert = true
                     
-                    // ローカルにもpending状態のアバターを追加
-                    addPendingAvatarLocally(avatarId: avatarId)
                 }
             }
         }
     }
     
-    // MARK: - Avatar Data Creation Function
-    private func createBlankAvatarData(avatarId: String, recipientName: String, creatorName: String) -> [String: Any] {
+    // MARK: - Avatar Data Creation（必要なフィールドのみ）
+    private func createAvatarData(
+        avatarId: String,
+        recipientName: String,
+        creatorName: String,
+        createURL: String
+    ) -> [String: Any] {
         return [
             "id": avatarId,
+            "name": recipientName, //             "isDefault": false,
+            "language": "English",
+            "theme": "Human",
+            "voiceTone": "Gentle",
+            "profileImg": "sample_avatar",
+            "deepfakeReady": false,
+            
             "recipient_name": recipientName,
             "creator_name": creatorName,
             "image_urls": [],
@@ -160,44 +168,38 @@ struct RequestConsentView: View {
             "status": "not_ready",
             "created_at": Timestamp(date: Date()),
             "updated_at": Timestamp(date: Date()),
-            "instructions": "Please upload your photos and record a voice message to complete this avatar",
-            "requested_by": creatorName,
-            "completion_percentage": 0, 
-            "required_images": 3,
-            "required_audio": true,
-            "avatar_type": "consent_requested"
+            "deepfake_video_urls": []
         ]
     }
     
-    // MARK: - Local Avatar Addition
-    private func addPendingAvatarLocally(avatarId: String) {
-        // ローカルのAvatarマネージャーにpending状態のアバターを追加
-        let pendingAvatar = Avatar(
-            id: abs(avatarId.hashValue),
-            name: recipientName.trimmingCharacters(in: .whitespacesAndNewlines),
-            isDefault: false,
-            language: "English",
-            theme: "Pending",
-            voiceTone: "Not Set",
-            profileImg: "sample_avatar",
-            deepfakeReady: false // not_ready状態なのでfalse
-        )
-        
-        appViewModel.avatarManager.addAvatar(pendingAvatar)
-        print("📱 ローカルにpendingアバターを追加: \(pendingAvatar.name)")
-    }
-    
     // MARK: - Helper Functions
-    private func generateAvatarId() -> String {
-        return "avatar_\(Date().timeIntervalSince1970)_\(Int.random(in: 1000...9999))"
+    private func createActivityItems() -> [Any] {
+        if let shareURL = createdShareURL, !shareURL.isEmpty {
+            guard let url = URL(string: shareURL) else {
+                return createFallbackItems()
+            }
+            
+            let customMessage = "Hey \(recipientName)! Please create an avatar for me using this link:"
+            return [customMessage, url]
+        } else {
+            return createFallbackItems()
+        }
     }
     
-    // MARK: - Debug Function
-    private func printAvatarData(_ data: [String: Any]) {
-        print("🔍 作成されるアバターデータ:")
-        for (key, value) in data {
-            print("  - \(key): \(value)")
+    private func createFallbackItems() -> [Any] {
+        let fallbackMessage = "Hey \(recipientName)! Please create an avatar for me on reMind app 💛"
+        
+        guard let fallbackURL = URL(string: "https://remind-f54ef.web.app/") else {
+            return [fallbackMessage]
         }
+        
+        return [fallbackMessage, fallbackURL]
+    }
+    
+    private func generateUniqueAvatarId() -> String {
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let randomComponent = Int.random(in: 1000...9999)
+        return "avatar_\(timestamp)_\(randomComponent)"
     }
 }
 
@@ -206,8 +208,10 @@ struct ActivityView: UIViewControllerRepresentable {
     let applicationActivities: [UIActivity]? = nil
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: activityItems,
-                                 applicationActivities: applicationActivities)
+        UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}

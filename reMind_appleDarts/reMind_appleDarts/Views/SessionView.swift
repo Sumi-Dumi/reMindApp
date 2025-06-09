@@ -51,12 +51,18 @@ struct TagView: View {
 }
 
 struct SessionView: View {
+    let avatar: Avatar?
+    
     @State private var currentStep: Int = 0
     @State private var recorded: Bool = false
     @State private var navigateToBreak = false
     @State private var isKeyboardMode: Bool = false
     @State private var inputText: String = ""
     @State private var tags: [String] = []
+
+    init(avatar: Avatar? = nil) {
+        self.avatar = avatar
+    }
 
     private var progress: Float {
         switch currentStep {
@@ -80,13 +86,24 @@ struct SessionView: View {
         "Focus on 2 things you can SMELL?",
         "Now, Tell me 1 thing you can TASTE?"
     ]
+    
+    private var currentVideoURL: String {
+        guard let avatar = avatar,
+              !avatar.deepfake_video_urls.isEmpty else {
+            // デフォルトの動画URL
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
+        }
+        
+        let videoIndex = min(currentStep, avatar.deepfake_video_urls.count - 1)
+        return avatar.deepfake_video_urls[videoIndex]
+    }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                VideoView()
+                VideoView(videoURL: currentVideoURL)
                     .ignoresSafeArea()
-
+                    .id("video_\(currentStep)") //
                 LinearGradient(
                     gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
                     startPoint: .top,
@@ -119,7 +136,6 @@ struct SessionView: View {
                         .padding(.horizontal, 24)
                         .frame(width: 346, height: 64)
                         .background(.black.opacity(0.4))
-//                        .background(.ultraThinMaterial)
                         .cornerRadius(12)
                         .multilineTextAlignment(.center)
 
@@ -128,8 +144,8 @@ struct SessionView: View {
                             if !inputText.isEmpty && tags.count < 5 {
                                 tags.insert(inputText, at: 0)
                                 DispatchQueue.main.async {
-                                            inputText = ""
-                                        }
+                                    inputText = ""
+                                }
                             }
                         })
                         .padding()
@@ -173,7 +189,6 @@ struct SessionView: View {
                                     .padding(.vertical, 26.66667)
                                     .frame(width: 100, height: 100)
                                     .background(Color.black.opacity(0.4))
-//                                    .background(.ultraThinMaterial)
                                     .cornerRadius(100)
                             }
                         } else {
@@ -222,6 +237,8 @@ struct SessionView: View {
                                         recorded = false
                                         inputText = ""
                                         tags.removeAll()
+                                        
+                                        print("🎬 Step \(currentStep): Playing video[\(min(currentStep, avatar?.deepfake_video_urls.count ?? 1) - 1)] = \(currentVideoURL)")
                                     } else {
                                         navigateToBreak = true
                                     }
@@ -250,11 +267,50 @@ struct SessionView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            if let avatar = avatar {
+                print("✅ SessionView started with avatar: \(avatar.name)")
+                print("📹 Available video URLs (\(avatar.deepfake_video_urls.count)): \(avatar.deepfake_video_urls)")
+                print("🎬 Starting with video: \(currentVideoURL)")
+            } else {
+                print("⚠️ SessionView started without avatar data, using default video")
+            }
+        }
     }
 }
 
 struct SessionView_Previews: PreviewProvider {
     static var previews: some View {
-        SessionView()
+        let sampleAvatar = Avatar(
+            id: "sample_avatar",
+            name: "Sample Avatar",
+            isDefault: true,
+            language: "English",
+            theme: "Calm",
+            voiceTone: "Gentle",
+            profileImg: "sample_avatar",
+            deepfakeReady: true,
+            recipient_name: "User",
+            creator_name: "Sample",
+            image_urls: [],
+            audio_url: "",
+            image_count: 0,
+            audio_size_mb: "0",
+            storage_provider: "cloudinary",
+            status: "ready",
+            created_at: nil,
+            updated_at: nil,
+            deepfake_video_urls: [
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294443/Grandma_It_s_Alright_tgrunw.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294444/Grandma_part_2_zutpaf.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294442/Grandma_doing_really_great_oaiikw.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_3_x7oud7.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_4_w1ski5.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294447/Grandma_part_5_vva1zv.mp4"
+            ]
+        )
+        
+        SessionView(avatar: sampleAvatar)
     }
 }

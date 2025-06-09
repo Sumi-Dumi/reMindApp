@@ -5,7 +5,6 @@
 //  Created by ryosuke on 2/6/2025.
 //
 
-
 import SwiftUI
 import AVKit
 
@@ -37,20 +36,23 @@ struct CustomVideoPlayerView: UIViewControllerRepresentable {
 }
 
 struct VideoView: View {
-    @State var player = AVPlayer(url: Bundle.main.url(forResource: "Grandma part 1", withExtension: "mp4")!)
+    let videoURL: String
+    @State var player: AVPlayer?
+
+    init(videoURL: String = "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4") {
+        self.videoURL = videoURL
+    }
 
     var body: some View {
-        CustomVideoPlayerView(player: player)
+        CustomVideoPlayerView(player: player ?? AVPlayer())
             .edgesIgnoringSafeArea(.all)
             .onAppear {
-                player.play()
+                player = AVPlayer(url: URL(string: videoURL)!)
+                player?.play()
             }
     }
 }
 
-
 #Preview {
-    VideoView()
+    VideoView(videoURL:"https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294447/Grandma_part_5_vva1zv.mp4")
 }
-
-

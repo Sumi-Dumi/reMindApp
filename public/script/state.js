@@ -12,8 +12,6 @@ const initialState = {
   isSubmitting: false,
   images: [],
   maxImages: APP_CONFIG.maxImages,
-  recipientName: 'User',        
-  creatorName: 'Creator', 
   isRecording: false,
   mediaRecorder: null,
   audioChunks: [],
@@ -101,3 +99,4 @@ export class AppState {
 
 // シングルトンインスタンス
 export const appState = new AppState();
+

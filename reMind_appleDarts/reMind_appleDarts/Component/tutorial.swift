@@ -11,30 +11,28 @@ struct TutorialPage {
 
 // MARK: - Main View
 struct TutorialView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     @State private var currentPage = 0
     @State private var navigateToMain = false
 
     private let pages: [TutorialPage] = [
         .init(imageName: "tut1", title: "Set-up your avatar with your loved ones", subtitle: "Just a few simple steps to get started!", buttonTitle: "Next"),
-        .init(imageName: "tut2", title: "reMind Shortcut", subtitle: "Here’s how to access support instantly.", buttonTitle: "Next"),
+        .init(imageName: "tut2", title: "reMind Shortcut", subtitle: "Here's how to access support instantly.", buttonTitle: "Next"),
         .init(imageName: "tut3", title: "5-4-3-2-1 Technique", subtitle: "Learn to ground yourself with ease.", buttonTitle: "Get Started", isFinalPage: true)
     ]
 
     var body: some View {
-        NavigationStack {
-            TutorialStepView(
-                page: pages[currentPage],
-                currentPage: currentPage,
-                totalPages: pages.count
-            ) {
-                if currentPage < pages.count - 1 {
-                    currentPage += 1
-                } else {
-                    navigateToMain = true
-                }
-            }
-            .navigationDestination(isPresented: $navigateToMain) {
-                MainView()
+        TutorialStepView(
+            page: pages[currentPage],
+            currentPage: currentPage,
+            totalPages: pages.count
+        )
+        {
+            if currentPage < pages.count - 1 {
+                currentPage += 1
+            } else {
+                appViewModel.markTutorialCompleted()
+                print("✅ Tutorial completed - transitioning to main app")
             }
         }
     }

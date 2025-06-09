@@ -1,54 +1,62 @@
-//
-//  Untitled.swift
-//  reMind_appleDarts
-//
-//  Created by user on 2025/06/03.
-//
-
 import Foundation
 import SwiftUI
+import Combine
 
-/// Main application view model that coordinates between authentication and avatar management
 class AppViewModel: ObservableObject {
     @Published var authViewModel: AuthenticationViewModel
-    @Published var avatarManager: AvatarManager
+    
+    @Published var firebaseUserManager = FirebaseUserManager()
+    
+    @Published var hasCompletedTutorial: Bool = UserDefaults.standard.bool(forKey: "hasCompletedTutorial")
+    
+    private var cancellables = Set<AnyCancellable>()
     
     init() {
-        // Initialize both view models without connection first
         self.authViewModel = AuthenticationViewModel()
-        self.avatarManager = AvatarManager()
         
-        // After initialization, set up the connection
-        avatarManager.setAuthViewModel(authViewModel)
+        self.authViewModel.setFirebaseUserManager(firebaseUserManager)
         
-        // Set up observer for user changes
         setupUserObserver()
+        
+
+        setupTutorialObserver()
     }
     
     // MARK: - Setup
     
     private func setupUserObserver() {
-        // When current user changes, reload avatars
         authViewModel.$currentUser
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
-                self?.avatarManager.loadAvatars()
+                print("🔄 User changed: \(user?.name ?? "None")")
+            }
+            .store(in: &cancellables)
+        
+        authViewModel.$isLoading
+            .receive(on: DispatchQueue.main)
+            .sink { loading in
+                print("🔄 Auth loading: \(loading)")
             }
             .store(in: &cancellables)
     }
     
-    private var cancellables = Set<AnyCancellable>()
+
+    private func setupTutorialObserver() {
+        $hasCompletedTutorial
+            .sink { completed in
+                print("🎓 Tutorial status changed: \(completed)")
+            }
+            .store(in: &cancellables)
+    }
     
     // MARK: - Convenience Properties
     
-    /// User display information
     var userDisplayName: String {
         return authViewModel.userDisplayName
     }
     
-    var userProfileImage: String {
-        // Return default avatar image if available, otherwise user profile image
-        return avatarManager.defaultAvatar?.profileImg ?? authViewModel.userProfileImage
+    var userProfileImageURL: String {
+        return authViewModel.userProfileImageURL
     }
     
     var isLoggedIn: Bool {
@@ -59,52 +67,128 @@ class AppViewModel: ObservableObject {
         return authViewModel.hasUser
     }
     
-    /// Avatar information
-    var hasAvatars: Bool {
-        return avatarManager.hasAvatars
+    var isLoading: Bool {
+        return authViewModel.isLoading
     }
     
-    var avatarCount: Int {
-        return avatarManager.avatarCount
+    var errorMessage: String {
+        return authViewModel.errorMessage
     }
     
-    var avatarCountDescription: String {
-        let count = avatarCount
-        return count == 0 ? "Feel grounded with your loved one" :
-               "You have \(count) support companion\(count == 1 ? "" : "s")"
+    var shouldShowOnboarding: Bool {
+        return !isLoggedIn
     }
     
-    // MARK: - Initialization Methods
-    
-    /// Ensure user exists when app starts
-    func initializeApp() {
-        if !authViewModel.hasUser {
-            authViewModel.createDummyUser()
-        }
+    var shouldShowTutorial: Bool {
+        return isLoggedIn && !hasCompletedTutorial
     }
     
-    /// Create demo data for development/testing
-    func createDemoData() {
-        if !authViewModel.hasUser {
-            authViewModel.createDummyUser()
-        }
-        avatarManager.createDemoAvatars()
+    var shouldShowMainApp: Bool {
+        return isLoggedIn && hasCompletedTutorial
     }
     
-    /// Reset all data
-    func resetAllData() {
-        avatarManager.clearAllAvatars()
+    // MARK: - User Management Methods
+    
+    func login(email: String, password: String) {
+        let user = User(
+            id: Int.random(in: 1000...9999),
+            name: "User",
+            email: email,
+            password: password,
+            profileImageURL: "",
+            avatars: []
+        )
+        authViewModel.login(with: user)
+    }
+    
+    func register(name: String, email: String, password: String) {
+        let user = User(
+            id: Int.random(in: 1000...9999),
+            name: name,
+            email: email,
+            password: password,
+            profileImageURL: "",
+            avatars: []
+        )
+        authViewModel.login(with: user)
+    }
+    
+    func logout() {
         authViewModel.logout()
     }
     
-    // MARK: - Quick Actions
+    func updateProfile(name: String? = nil, email: String? = nil, profileImageURL: String? = nil, password: String? = nil) {
+        authViewModel.updateUserProfile(
+            name: name,
+            email: email,
+            profileImageURL: profileImageURL,
+            password: password
+        )
+    }
     
-    /// Quick method to create a sample avatar
-    func createSampleAvatar() {
-        let sampleAvatar = avatarManager.createSampleAvatar()
-        avatarManager.addAvatar(sampleAvatar)
+    func updateProfileImageURL(_ url: String) {
+        authViewModel.updateUserProfile(profileImageURL: url)
+    }
+    
+
+    func loadAndSetCurrentUser(userId: String, completion: @escaping (User?) -> Void) {
+        firebaseUserManager.loadAndSetCurrentUser(userId: userId) { [weak self] user in
+            DispatchQueue.main.async {
+                if let user = user {
+                    self?.authViewModel.currentUser = user
+                    self?.authViewModel.isLoggedIn = true
+                }
+                completion(user)
+            }
+        }
+    }
+    
+    // MARK: - 🆕 Tutorial Management Methods
+    
+    func markTutorialCompleted() {
+        UserDefaults.standard.set(true, forKey: "hasCompletedTutorial")
+        DispatchQueue.main.async {
+            self.hasCompletedTutorial = true
+        }
+        print("✅ Tutorial marked as completed")
+    }
+    
+    func resetTutorial() {
+        UserDefaults.standard.set(false, forKey: "hasCompletedTutorial")
+        DispatchQueue.main.async {
+            self.hasCompletedTutorial = false
+        }
+        print("🔄 Tutorial reset")
+    }
+    
+    func checkTutorialStatus() {
+        let completed = UserDefaults.standard.bool(forKey: "hasCompletedTutorial")
+        DispatchQueue.main.async {
+            self.hasCompletedTutorial = completed
+        }
+        print("🔍 Tutorial status checked: \(completed)")
+    }
+    
+    // MARK: - 🆕 Auto Login Methods
+    
+    func checkAutoLogin() {
+        print("🔍 Checking auto login...")
+        
+        guard firebaseUserManager.hasValidSession() else {
+            print("⚠️ No valid session found")
+            return
+        }
+        
+        firebaseUserManager.checkAutoLogin()
+    }
+    
+    func hasValidSession() -> Bool {
+        return firebaseUserManager.hasValidSession()
+    }
+    
+    // MARK: - Error Handling
+    
+    func clearError() {
+        authViewModel.clearError()
     }
 }
-
-// MARK: - Combine Import
-import Combine

@@ -12,7 +12,6 @@ import {
   showError, 
   hideMessages, 
   showSuccessWithSharing, 
-  generateAvatarId,
   setupGlobalErrorHandling 
 } from './utils.js';
 
@@ -26,25 +25,29 @@ export class MainController {
     try {
       console.log('🚀 reMind App with Firebase + Cloudinary を開始');
       
-      // Firebase初期化を待つ
+      // ⭐ まずFirebaseを初期化
       await firebaseService.initialize();
       
-      // DOM要素取得
+      // ⭐ その後でURL解析とアバター読み込み
+      const avatarId = this.getAvatarIdFromURL();
+      if (avatarId) {
+        console.log('🔗 URL Avatar ID:', avatarId);
+        appState.set('avatarId', avatarId);
+        appState.set('isEditMode', true);
+        
+        // Firebase初期化後なので安全
+        await this.loadExistingAvatar(avatarId);
+      } else {
+        console.log('🆕 新規アバター作成モード');
+        appState.set('isEditMode', false);
+      }
+      
+      // 以下既存のコード...
       domManager.initialize();
-      
-      // イベントリスナー設定
       this.setupEventListeners();
-      
-      // 画像セクション拡張
       imageHandler.enhanceImageSection();
-      
-      // UI状態更新
       this.updateUI();
-      
-      // 状態変更の監視
       this.setupStateObserver();
-      
-      // グローバルエラーハンドリング
       setupGlobalErrorHandling();
       
       this.initialized = true;
@@ -56,22 +59,72 @@ export class MainController {
     }
   }
 
+
+  // URL解析メソッドを追加
+  getAvatarIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // 方式1: ?avatarId=xxx の形式
+    const avatarIdParam = urlParams.get('avatarId');
+    if (avatarIdParam) {
+      return avatarIdParam;
+    }
+    
+    // 方式2: ?avatar_1749297509_8523 の形式
+    const queryString = window.location.search;
+    if (queryString.startsWith('?avatar_')) {
+      return queryString.substring(1);
+    }
+    
+    // 方式3: URLパラメータの最初のキーがアバターIDの場合
+    const firstParam = urlParams.keys().next().value;
+    if (firstParam && firstParam.startsWith('avatar_')) {
+      return firstParam;
+    }
+    
+    return null;
+  }
+
+  // 既存アバター読み込みメソッドを追加
+  async loadExistingAvatar(avatarId) {
+    try {
+      console.log('📥 Loading existing avatar data for:', avatarId);
+      
+      const avatarData = await firebaseService.getAvatar(avatarId);
+      
+      if (avatarData) {
+        console.log('✅ Existing avatar found:', avatarData);
+        this.displayExistingAvatarInfo(avatarData);
+      } else {
+        console.log('⚠️ No existing avatar data found for ID:', avatarId);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error loading existing avatar:', error);
+    }
+  }
+
+  // UI更新メソッドを追加
+  displayExistingAvatarInfo(avatarData) {
+    if (avatarData.recipient_name) {
+      const headerText = document.querySelector('.header-text');
+      if (headerText) {
+        headerText.innerHTML = `Help ${avatarData.recipient_name} feel safer`;
+      }
+    }
+    
+    if (avatarData.creator_name) {
+      const subheaderText = document.querySelector('.subheader-text');
+      if (subheaderText) {
+        subheaderText.innerHTML = `${avatarData.creator_name} has requested you to create a personalized avatar.`;
+      }
+    }
+    
+    console.log(`📊 Avatar Status: ${avatarData.status}`);
+  }
+
   // イベントリスナー設定
   setupEventListeners() {
-    // 名前入力フィールド
-    const recipientInput = domManager.get('recipientInput');
-    if (recipientInput) {
-      recipientInput.addEventListener('input', (e) => {
-        appState.set('recipientName', e.target.value.trim());
-      });
-    }
-
-    const creatorInput = domManager.get('creatorInput');
-    if (creatorInput) {
-      creatorInput.addEventListener('input', (e) => {
-        appState.set('creatorName', e.target.value.trim());
-      });
-    }
 
     // チェックボックス機能
     const agreeTerms = domManager.get('agreeTerms');
@@ -124,44 +177,46 @@ export class MainController {
     domManager.updateSubmitButton(canSubmit, isSubmitting);
   }
 
-  // メイン送信処理
+
+
+    // メイン送信処理
   async handleSubmit() {
     const submitButton = domManager.get('submitButton');
     if (submitButton?.disabled || appState.get('isSubmitting')) return;
     
     appState.set('isSubmitting', true);
-    submitButton.innerHTML = 'アップロード中...';
+    submitButton.innerHTML = 'uploading...';
     
     try {
       hideMessages();
       console.log('🚀 アップロードプロセス開始...');
       
-      // ユニークなアバターID生成
-      const avatarId = generateAvatarId();
-      console.log(`📝 アバター ID: ${avatarId}`);
+      // アバターIDの取得
+      const avatarId = appState.get('avatarId');
+      if (!avatarId) {
+        showError('cannot upload without avatarId');
+        return;
+      }
       
       // Step 1: Cloudinaryにアップロード
       console.log('☁️ Cloudinaryにアップロード中...');
       const { imageUrls, audioUrl } = await uploadService.uploadToCloudinary(avatarId);
       console.log(`✅ Cloudinaryアップロード完了:`, { imageUrls, audioUrl });
       
-      // Step 2: Firebaseにメタデータ保存
-      console.log('🔥 Firebaseにメタデータ保存中...');
-      const docId = await firebaseService.saveMetadata({
-        id: avatarId,
-        recipient_name: appState.get('recipientName'),
-        creator_name: appState.get('creatorName'),
+      // Step 2: 新規作成ではなく既存ドキュメントを更新
+      await firebaseService.updateExistingAvatar(avatarId, {
         image_urls: imageUrls,
         audio_url: audioUrl,
-        image_count: appState.get('images').length,
-        audio_size_mb: (appState.get('audioBlob').size / 1024 / 1024).toFixed(2),
-        storage_provider: 'cloudinary',
-        status: 'ready',
-        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'not_ready',
         updated_at: firebase.firestore.FieldValue.serverTimestamp()
       });
       
-      console.log(`✅ Firebase保存完了。Doc ID: ${docId}`);
+      // ⭐ docIdを削除（更新処理では不要）
+      console.log(`✅ Firebase更新完了: ${avatarId}`);
+      
+      setTimeout(() => {
+        window.location.href = './thankyou.html';
+      }, 500);
       
       // 成功表示
       showSuccessWithSharing(
@@ -172,13 +227,12 @@ export class MainController {
       
     } catch (error) {
       console.error('❌ アップロードに失敗:', error);
-      showError(`アップロードに失敗しました: ${error.message}`);
+      showError(`Failed to upload: ${error.message}`);
     } finally {
       appState.set('isSubmitting', false);
       submitButton.innerHTML = 'Submit';
     }
   }
-
   // フォームリセット
   resetForm() {
     appState.reset();

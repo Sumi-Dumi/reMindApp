@@ -218,68 +218,6 @@ export class UploadService {
     }
   }
 
-  // アップロード状況の検証
-  async validateUpload(imageUrls, audioUrl) {
-    const validationResults = {
-      images: [],
-      audio: null,
-      allValid: true
-    };
-
-    try {
-      // 画像URLの検証
-      for (let i = 0; i < imageUrls.length; i++) {
-        try {
-          const response = await fetch(imageUrls[i], { method: 'HEAD' });
-          validationResults.images.push({
-            index: i,
-            url: imageUrls[i],
-            valid: response.ok,
-            status: response.status
-          });
-          
-          if (!response.ok) {
-            validationResults.allValid = false;
-          }
-        } catch (error) {
-          validationResults.images.push({
-            index: i,
-            url: imageUrls[i],
-            valid: false,
-            error: error.message
-          });
-          validationResults.allValid = false;
-        }
-      }
-
-      // 音声URLの検証
-      try {
-        const response = await fetch(audioUrl, { method: 'HEAD' });
-        validationResults.audio = {
-          url: audioUrl,
-          valid: response.ok,
-          status: response.status
-        };
-        
-        if (!response.ok) {
-          validationResults.allValid = false;
-        }
-      } catch (error) {
-        validationResults.audio = {
-          url: audioUrl,
-          valid: false,
-          error: error.message
-        };
-        validationResults.allValid = false;
-      }
-
-    } catch (error) {
-      console.error('❌ アップロード検証中にエラー:', error);
-      validationResults.allValid = false;
-    }
-
-    return validationResults;
-  }
 
   // アップロード進捗のクリーンアップ
   cleanup() {
@@ -288,23 +226,6 @@ export class UploadService {
     domManager.showProgress('audio', false);
   }
 
-  // アップロード統計取得
-  getUploadStats() {
-    const images = appState.get('images');
-    const audioBlob = appState.get('audioBlob');
-    
-    const totalImageSize = images.reduce((sum, img) => sum + img.file.size, 0);
-    const audioSize = audioBlob ? audioBlob.size : 0;
-    const totalSize = totalImageSize + audioSize;
-
-    return {
-      imageCount: images.length,
-      totalImageSize,
-      audioSize,
-      totalSize,
-      totalSizeMB: (totalSize / 1024 / 1024).toFixed(2)
-    };
-  }
 }
 
 // シングルトンインスタンス

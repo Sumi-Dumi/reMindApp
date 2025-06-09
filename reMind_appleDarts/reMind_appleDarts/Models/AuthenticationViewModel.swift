@@ -1,58 +1,84 @@
-//
-//  AuthenticationViewModel.swift
-//  reMind_appleDarts
-//
-//  Created by user on 2025/06/03.
-//
-
 import Foundation
+import Combine
 
 class AuthenticationViewModel: ObservableObject {
     @Published var currentUser: User?
     @Published var isLoggedIn: Bool = false
     @Published var isLoading: Bool = false
     
+
+    private var firebaseUserManager: FirebaseUserManager?
+    private var cancellables = Set<AnyCancellable>()
+    
     init() {
-        loadStoredUser()
+
+    }
+    
+
+    func setFirebaseUserManager(_ manager: FirebaseUserManager) {
+        self.firebaseUserManager = manager
+        setupUserObserver()
+    }
+    
+    private func setupUserObserver() {
+        guard let firebaseUserManager = firebaseUserManager else { return }
+        
+        firebaseUserManager.$currentUser
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                self?.currentUser = user
+                self?.isLoggedIn = user != nil
+            }
+            .store(in: &cancellables)
+        
+        firebaseUserManager.$isLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] loading in
+                self?.isLoading = loading
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - User Authentication
     
     func login(with user: User) {
-        self.currentUser = user
+        firebaseUserManager?.saveUser(user)
+    }
+    
+    func loginWithFirebaseUser(_ firebaseUser: FirebaseUser) {
+        let localUser = firebaseUser.toLocalUser()
+        self.currentUser = localUser
         self.isLoggedIn = true
-        UserManager.shared.saveUser(user)
+        
+        firebaseUserManager?.currentUser = localUser
+        firebaseUserManager?.currentUserId = firebaseUser.id
+        
+        print("✅ User logged in: \(firebaseUser.name)")
     }
     
     func logout() {
+        firebaseUserManager?.clearUser()
         self.currentUser = nil
         self.isLoggedIn = false
-        UserManager.shared.clearUser()
     }
     
     func createDummyUser() {
-        let dummyUser = User(
-            id: Int.random(in: 1000...9999),
-            name: "User",
-            email: "user@example.com",
-            password: "",
-            profileImg: "sample_avatar",
-            avatars: []
-        )
-        login(with: dummyUser)
-    }
-    
-    private func loadStoredUser() {
-        if let storedUser = UserManager.shared.loadUser() {
-            self.currentUser = storedUser
-            self.isLoggedIn = true
-        }
+        guard let firebaseUserManager = firebaseUserManager else { return }
+        let dummyUser = firebaseUserManager.createDummyUser()
+        print("✅ Dummy user created: \(dummyUser.name)")
     }
     
     // MARK: - User Profile Management
     
-    func updateUserProfile(name: String? = nil, email: String? = nil, profileImg: String? = nil) {
-        guard var user = currentUser else { return }
+    func updateUserProfile(name: String? = nil, email: String? = nil, profileImageURL: String? = nil, password: String? = nil) {
+        guard var user = currentUser else {
+            print("❌ No current user to update")
+            return
+        }
+        
+        print("🔄 Updating user profile...")
+        print("  - Current user: \(user.name)")
+        print("  - FirebaseUserManager currentUserId: \(firebaseUserManager?.currentUserId ?? "nil")")
         
         if let name = name {
             user.name = name
@@ -60,12 +86,11 @@ class AuthenticationViewModel: ObservableObject {
         if let email = email {
             user.email = email
         }
-        if let profileImg = profileImg {
-            user.profileImg = profileImg
+        if let profileImageURL = profileImageURL {
+            user.profileImageURL = profileImageURL
         }
         
-        self.currentUser = user
-        UserManager.shared.saveUser(user)
+        firebaseUserManager?.updateUser(user)
     }
     
     // MARK: - User Data Access
@@ -74,8 +99,8 @@ class AuthenticationViewModel: ObservableObject {
         return currentUser?.displayName ?? "User"
     }
     
-    var userProfileImage: String {
-        return currentUser?.profileImg ?? "sample_avatar"
+    var userProfileImageURL: String {
+        return currentUser?.displayProfileImageURL ?? ""
     }
     
     var userEmail: String {
@@ -85,11 +110,18 @@ class AuthenticationViewModel: ObservableObject {
     var hasUser: Bool {
         return currentUser != nil
     }
-}
-
-// MARK: - User Extensions
-extension User {
-    var displayName: String {
-        return name.isEmpty ? "User" : name
+    
+    var hasValidProfileImage: Bool {
+        return currentUser?.hasValidProfileImage ?? false
+    }
+    
+    // MARK: - Error Handling
+    
+    var errorMessage: String {
+        return firebaseUserManager?.errorMessage ?? ""
+    }
+    
+    func clearError() {
+        firebaseUserManager?.clearError()
     }
 }

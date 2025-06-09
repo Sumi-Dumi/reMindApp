@@ -1,12 +1,3 @@
-//
-//  MainView_firebase.swift
-//  reMind_appleDarts
-//
-//  Created by ryosuke on 6/6/2025.
-//
-
-
-
 import SwiftUI
 
 struct MainView_Firebase: View {
@@ -15,20 +6,40 @@ struct MainView_Firebase: View {
     @State private var refreshTrigger = UUID()
     @State private var showingCreateView = false
     
+    let previewUserId: String?
+    
+    @State private var displayName: String = "User"
+    @State private var displayProfileImageURL: String = ""
+    @State private var isLoadingUser: Bool = false
+    
+    init(previewUserId: String? = nil) {
+        self.previewUserId = previewUserId
+    }
+    
     var body: some View {
-        NavigationView {
-        ZStack{
-            // Background
-            BackGroundView()
-            
-
+            ZStack{
+                // Background
+                BackGroundView()
+                
                 VStack(spacing: 15){
-                    // User card with dynamic data
+                    Spacer()
+                        .frame(height: 20)
                     UserCard(
-                        welcomeText: "Welcome \(appViewModel.userDisplayName)!",
+                        welcomeText: "Welcome \(displayName)!",
                         descriptionText: avatarCountDescription,
-                        avatarImageName: appViewModel.userProfileImage
+                        profileImageURL: displayProfileImageURL
                     )
+                    
+                    if isLoadingUser {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Loading user profile...")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.bottom, 10)
+                    }
                     
                     Spacer()
                     
@@ -39,7 +50,6 @@ struct MainView_Firebase: View {
                         Spacer()
                         
                         HStack(spacing: 12) {
-                            // Add avatar button
                             NavigationLink(destination: RequestConsentView()
                                 .environmentObject(appViewModel)
                                 .onDisappear {
@@ -99,50 +109,26 @@ struct MainView_Firebase: View {
                         .padding()
                     }
                     
-                    // List for supporter
                     ScrollView {
                         LazyVStack(spacing: 12) {
-                            ForEach(firebaseAvatarManager.firestoreAvatars, id: \.id) { firestoreAvatar in
-                                if firestoreAvatar.status == "ready" {
-                                    // if Ready
-//                                    FirebaseAvatarCard(
-//                                        avatar: firestoreAvatar.toLocalAvatar(),
-//                                        firestoreAvatar: firestoreAvatar,
-//                                        onStartSession: {
-//                                            print("Firebase \(firestoreAvatar.creator_name) session started!")
-//                                        }
-//                                    )
-//                                    .transition(.asymmetric(
-//                                        insertion: .opacity.combined(with: .slide),
-//                                        removal: .opacity.combined(with: .scale(scale: 0.8))
-//                                    ))
+                            ForEach(sortedAvatars, id: \.id) { avatar in
+                                if avatar.status == "ready" {
+                                    EnhancedAvatarCard(
+                                        avatar: avatar,
+                                    )
+                                    .transition(.asymmetric(
+                                        insertion: .opacity.combined(with: .slide),
+                                        removal: .opacity.combined(with: .scale(scale: 0.8))
+                                    ))
                                 } else {
-                                    // else pending
-                                    PendingCard(avatarName: firestoreAvatar.recipient_name)
+                                    PendingCard(avatarName: avatar.recipient_name)
                                         .transition(.asymmetric(
                                             insertion: .opacity.combined(with: .slide),
                                             removal: .opacity.combined(with: .scale(scale: 0.8))
                                         ))
                                 }
                             }
-                            
-                            // Firebaseアバター表示
-                            ForEach(firebaseAvatarManager.avatars, id: \.id) { avatar in
-                                EnhancedAvatarCard(
-                                    avatar: avatar,
-                                    onStartSession: {
-                                        print("Firebase \(avatar.name) session started!")
-                                    }
-                                )
-                                .transition(.asymmetric(
-                                    insertion: .opacity.combined(with: .slide),
-                                    removal: .opacity.combined(with: .scale(scale: 0.8))
-                                ))
-                            }
-                            
-                            // Empty state
-                            if getCurrentLocalAvatars().isEmpty &&
-                               firebaseAvatarManager.avatars.isEmpty &&
+                            if firebaseAvatarManager.avatars.isEmpty &&
                                !firebaseAvatarManager.isLoading {
                                 EmptyAvatarStateView()
                                     .padding(.vertical, 40)
@@ -156,14 +142,10 @@ struct MainView_Firebase: View {
                     
                     Spacer()
                 }
-            }
-        }
-        .sheet(isPresented: $showingCreateView) {
-            CreateAvatarView()
-                .environmentObject(appViewModel)
+            
         }
         .onAppear {
-            appViewModel.initializeApp()
+            loadUserData()
             firebaseAvatarManager.refresh()
         }
         .onReceive(firebaseAvatarManager.$avatars) { _ in
@@ -171,20 +153,53 @@ struct MainView_Firebase: View {
         }
     }
     
-    private var avatarCountDescription: String {
-        let localCount = getCurrentLocalAvatars().count
-        let firebaseCount = firebaseAvatarManager.avatars.count
-        let totalCount = localCount + firebaseCount
-        
-        if totalCount == 0 {
-            return "No support companions yet"
+    private func loadUserData() {
+        if let userId = previewUserId {
+            loadPreviewUser(userId: userId)
+        } else if let user = appViewModel.authViewModel.currentUser {
+            displayName = user.name
+            displayProfileImageURL = user.profileImageURL
+            print("✅ Loaded user from appViewModel: \(user.name)")
         } else {
-            return "You have \(totalCount) support companion\(totalCount == 1 ? "" : "s")"
+            print("⚠️ No user found in appViewModel")
         }
     }
     
-    private func getCurrentLocalAvatars() -> [Avatar] {
-        return appViewModel.avatarManager.avatars.sorted { first, second in
+    private func loadPreviewUser(userId: String) {
+        isLoadingUser = true
+        let firebaseUserManager = FirebaseUserManager()
+        
+        firebaseUserManager.getUserById(userId) { user in
+            DispatchQueue.main.async {
+                isLoadingUser = false
+                
+                if let user = user {
+                    displayName = user.name
+                    displayProfileImageURL = user.profileImageURL
+                    
+                    appViewModel.authViewModel.currentUser = user
+                    appViewModel.authViewModel.isLoggedIn = true
+                } else {
+                    displayName = "Test User (\(userId.prefix(8)))"
+                    displayProfileImageURL = "https://res.cloudinary.com/dvyjkf3xq/image/upload/v1749361609/initial_profile_zfoxw0.png"
+                    
+                }
+            }
+        }
+    }
+    
+    private var avatarCountDescription: String {
+        let firebaseCount = firebaseAvatarManager.avatars.count
+        
+        if firebaseCount == 0 {
+            return "No support companions yet"
+        } else {
+            return "You have \(firebaseCount) support companion\(firebaseCount == 1 ? "" : "s")"
+        }
+    }
+    
+    private var sortedAvatars: [Avatar] {
+        return firebaseAvatarManager.avatars.sorted { first, second in
             if first.isDefault && !second.isDefault {
                 return true
             } else if !first.isDefault && second.isDefault {
@@ -201,9 +216,7 @@ struct MainView_Firebase: View {
         }
     }
 }
-
-
-#Preview {
-    MainView_Firebase()
+#Preview("With Specific User") {
+    MainView_Firebase(previewUserId: "BKkzo8JLqoCNQq4jo3yw")
         .environmentObject(AppViewModel())
 }
