@@ -21,6 +21,7 @@ struct Break: View {
                     Text("Lastly, let me guide your breathing to help you relax!")
                         .font(.subheadline)
                         .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
                 }
 
                 NavigationLink(destination: PulsingView()) {
