@@ -32,7 +32,7 @@ struct TagView: View {
     private func tagView(for text: String) -> some View {
         HStack(spacing: 4) {
             Text(text)
-                .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
+                .foregroundColor(Color.primaryText)
 
             Button(action: {
                 onRemove(text)
@@ -40,7 +40,7 @@ struct TagView: View {
                 Image(systemName: "xmark")
                     .resizable()
                     .frame(width: 10, height: 10)
-                    .foregroundColor(Color(red: 100 / 255, green: 116 / 255, blue: 139 / 255))
+                    .foregroundColor(Color.primaryText)
             }
         }
         .padding(.horizontal, 12)
@@ -150,7 +150,7 @@ struct SessionView: View {
                         })
                         .padding()
                         .frame(width: 346, height: 64)
-                        .background(RoundedRectangle(cornerRadius: 12))
+                        .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1))
                         .foregroundColor(.black)
                         
@@ -271,9 +271,9 @@ struct SessionView: View {
             if let avatar = avatar {
                 print("✅ SessionView started with avatar: \(avatar.name)")
                 print("📹 Available video URLs (\(avatar.deepfake_video_urls.count)): \(avatar.deepfake_video_urls)")
-                print("🎬 Starting with video: \(currentVideoURL)")
+                print("Starting with video: \(currentVideoURL)")
             } else {
-                print("⚠️ SessionView started without avatar data, using default video")
+                print("SessionView started without avatar data, using default video")
             }
         }
     }
