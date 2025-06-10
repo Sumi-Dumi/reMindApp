@@ -78,10 +78,10 @@ struct SessionView: View {
     }
 
     let prompts = [
-        "Its OKAY, I Got U",
+        "Hi pumpkin, I'm here for you",
         "Now, What are 5 things you can SEE?",
         "Now, Tell me 4 things you can TOUCH?",
-        "You are doing GREAT!!",
+        "You are doing realy great honey!",
         "Now, Tell me 3 things you HEAR?",
         "Focus on 2 things you can SMELL?",
         "Now, Tell me 1 thing you can TASTE?"
@@ -215,12 +215,12 @@ struct SessionView: View {
 
                             Spacer()
 
-                            if recorded || (!tags.isEmpty) {
+                            if recorded || (!tags.isEmpty) || currentStep == 0 || currentStep == 3{
                                 HStack(spacing: 30) {
                                     Button(action: {
                                         recorded = false
                                         inputText = ""
-                                        tags.removeAll()
+                                        tags.removeAll() 
                                     }) {
                                         Image(systemName: "xmark")
                                             .resizable()
