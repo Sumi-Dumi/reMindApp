@@ -76,7 +76,7 @@ struct SessionViewKeyboard: View {
         @State private var showMicView = false
 
         let prompts = [
-            "Its OKAY, I Got U",
+            "It' okay, I got you",
             "Now, What are 5 things you can SEE?",
             "Now, Tell me 4 things you can TOUCH?",
             "You are doing GREAT!!",
