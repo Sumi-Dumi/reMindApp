@@ -196,5 +196,5 @@ struct VideoView: View {
 }
 
 #Preview {
-    VideoView(videoURL: "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294447/Grandma_part_5_vva1zv.mp4")
+    VideoView(videoURL: "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4")
 }
