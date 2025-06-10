@@ -36,6 +36,8 @@ struct VideoView: View {
     @State private var isLoading = true
     @State private var hasError = false
     @State private var cancellables = Set<AnyCancellable>()
+    @State private var overlayOpacity: Double = 0.0
+
 
     init(videoURL: String = "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4") {
         self.videoURL = videoURL
@@ -51,6 +53,13 @@ struct VideoView: View {
                 )
                 .edgesIgnoringSafeArea(.all)
             }
+            
+            Color.black
+                            .opacity(overlayOpacity)
+                            .edgesIgnoringSafeArea(.all)
+                            .animation(.easeInOut(duration: 0.6), value: overlayOpacity)
+
+
             
             if isLoading {
                 ProgressView()
@@ -131,6 +140,17 @@ struct VideoView: View {
                     isLoading = false
                     hasError = false
                     newPlayer.play()
+                    
+                    NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: newPlayer.currentItem)
+                        .receive(on: DispatchQueue.main)
+                        .sink { _ in
+                            print("🛑 Video ended — show grey overlay")
+                            withAnimation(.easeInOut(duration: 0.6)) {
+                                overlayOpacity = 0.2
+                            }
+                        }
+                        .store(in: &cancellables)
+
                 case .failed:
                     print("❌ Video failed to load: \(newPlayer.error?.localizedDescription ?? "Unknown error")")
                     isLoading = false
