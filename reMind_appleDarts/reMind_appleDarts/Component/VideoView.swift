@@ -164,7 +164,7 @@ struct VideoView: View {
             .store(in: &cancellables)
         
         
-        // エラー監視
+
         NotificationCenter.default.publisher(for: .AVPlayerItemFailedToPlayToEndTime, object: newPlayer.currentItem)
             .receive(on: DispatchQueue.main)
             .sink { _ in
@@ -174,7 +174,6 @@ struct VideoView: View {
             }
             .store(in: &cancellables)
         
-        // タイムアウト設定
         DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
             if isLoading {
                 print("⏰ Video loading timeout")

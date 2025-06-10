@@ -10,7 +10,6 @@ struct ContentView: View {
             } else if appViewModel.shouldShowTutorial {
                 TutorialView()
             } else {
-                // ログイン済みでチュートリアル完了済み、またはデフォルト
                 MainTabView()
             }
         }
