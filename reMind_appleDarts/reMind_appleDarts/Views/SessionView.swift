@@ -215,44 +215,46 @@ struct SessionView: View {
 
                             Spacer()
 
-                            HStack(spacing: 30) {
-                                Button(action: {
-                                    recorded = false
-                                    inputText = ""
-                                    tags.removeAll()
-                                }) {
-                                    Image(systemName: "xmark")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 12, height: 12)
-                                        .padding(10)
-                                        .background(Color.black.opacity(0.3))
-                                        .clipShape(Circle())
-                                        .foregroundColor(.white)
-                                }
-
-                                Button(action: {
-                                    if currentStep < prompts.count - 1 {
-                                        currentStep += 1
+                            if recorded {
+                                HStack(spacing: 30) {
+                                    Button(action: {
                                         recorded = false
                                         inputText = ""
                                         tags.removeAll()
-                                        
-                                        print("🎬 Step \(currentStep): Playing video[\(min(currentStep, avatar?.deepfake_video_urls.count ?? 1) - 1)] = \(currentVideoURL)")
-                                    } else {
-                                        navigateToBreak = true
+                                    }) {
+                                        Image(systemName: "xmark")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 12, height: 12)
+                                            .padding(10)
+                                            .background(Color.black.opacity(0.3))
+                                            .clipShape(Circle())
+                                            .foregroundColor(.white)
                                     }
-                                }) {
-                                    Image(systemName: "checkmark")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 12, height: 12)
-                                        .foregroundColor(.black)
-                                        .padding(8)
-                                        .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
-                                        .clipShape(Circle())
+
+                                    Button(action: {
+                                        if currentStep < prompts.count - 1 {
+                                            currentStep += 1
+                                            recorded = false
+                                            inputText = ""
+                                            tags.removeAll()
+                                            print("🎬 Step \(currentStep): Playing video[\(min(currentStep, avatar?.deepfake_video_urls.count ?? 1) - 1)] = \(currentVideoURL)")
+                                        } else {
+                                            navigateToBreak = true
+                                        }
+                                    }) {
+                                        Image(systemName: "checkmark")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 12, height: 12)
+                                            .foregroundColor(.black)
+                                            .padding(8)
+                                            .background(Color(red: 220 / 255, green: 236 / 255, blue: 125 / 255))
+                                            .clipShape(Circle())
+                                    }
                                 }
                             }
+
                         }
                         .padding(.horizontal, 30)
                     }
