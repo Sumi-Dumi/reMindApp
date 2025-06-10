@@ -215,7 +215,7 @@ struct SessionView: View {
 
                             Spacer()
 
-                            if recorded {
+                            if recorded || (!tags.isEmpty) {
                                 HStack(spacing: 30) {
                                     Button(action: {
                                         recorded = false
@@ -254,6 +254,7 @@ struct SessionView: View {
                                     }
                                 }
                             }
+
 
                         }
                         .padding(.horizontal, 30)
