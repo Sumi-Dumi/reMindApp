@@ -24,7 +24,7 @@ struct MainView_Firebase: View {
                 VStack(spacing: 15){
                     Spacer()
                         .frame(height: 20)
-                    UserCard(
+                    UserCard( 
                         welcomeText: "Welcome \(displayName)!",
                         descriptionText: avatarCountDescription,
                         profileImageURL: displayProfileImageURL
