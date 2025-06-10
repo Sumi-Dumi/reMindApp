@@ -80,12 +80,17 @@ struct EnhancedAvatarCard: View {
                                 showingEditView = true
                             }
                         }) {
-                            Image(systemName: "pencil")
-                                .foregroundColor(.gray)
-                                .font(.system(size: 16, weight: .medium))
-                                .padding(8)
-                                .background(Color.white.opacity(0.8))
-                                .clipShape(Circle())
+                            HStack(spacing: 4) {
+                                Image(systemName: "pencil")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 16, weight: .medium))
+
+                                Text("Edit")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            .padding(8)
+                           
                         }
                         .buttonStyle(PlainButtonStyle())
                     }

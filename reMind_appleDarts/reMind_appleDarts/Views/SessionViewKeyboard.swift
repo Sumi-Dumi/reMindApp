@@ -76,13 +76,13 @@ struct SessionViewKeyboard: View {
         @State private var showMicView = false
 
         let prompts = [
-            "It' okay, I got you",
-            "Now, What are 5 things you can SEE?",
-            "Now, Tell me 4 things you can TOUCH?",
-            "You are doing GREAT!!",
-            "Now, Tell me 3 things you HEAR?",
+            "Its OKAY, I Got U",
+            "What are 5 things you can SEE?",
+            "Tell me 4 things you can TOUCH?",
+            "You are doing Really Great!",
+            "Tell me 3 things you HEAR?",
             "Focus on 2 things you can SMELL?",
-            "Now, Tell me 1 thing you can TASTE?"
+            "Tell me 1 thing you can TASTE?"
         ]
 
         var body: some View {
