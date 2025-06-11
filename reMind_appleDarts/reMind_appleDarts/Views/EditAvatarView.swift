@@ -18,7 +18,7 @@ struct EditAvatarView: View {
     @State private var validationMessage = ""
     @State private var showingDiscardAlert = false
     @State private var showingDeleteAlert = false
-    
+     
     private var db = Firestore.firestore()
 
     private let languages = ["English", "Japanese", "Spanish", "French", "German", "Italian"]
