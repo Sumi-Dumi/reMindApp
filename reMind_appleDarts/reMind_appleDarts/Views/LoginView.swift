@@ -19,13 +19,15 @@ struct LoginView: View {
             VStack(spacing: 24) {
                 Spacer()
 
-                Text("Login")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.black)
+                VStack(spacing: 8) {
+                    Text("Login")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.black)
 
-                Text("Let's get you logged in!")
-                    .font(.subheadline)
-                    .foregroundColor(Color.gray)
+                    Text("Let's get you logged in!")
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                }
 
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading) {

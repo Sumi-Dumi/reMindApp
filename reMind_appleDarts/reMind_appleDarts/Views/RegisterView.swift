@@ -20,14 +20,17 @@ struct RegisterView: View {
 
             VStack(spacing: 24) {
                 Spacer()
-
-                Text("Register")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.black)
-
-                Text("Let's get you started")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                
+                VStack(spacing: 8) {
+                    
+                    Text("Register")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.black)
+                    
+                    Text("Let's get you started")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
 
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading) {
