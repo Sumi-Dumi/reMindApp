@@ -24,7 +24,7 @@ struct MainTabView: View {
                             Text("Home")
                         }
 
-                    MainView_Firebase()
+                    Avatars()
                         .environmentObject(appViewModel)
                         .tag(1)
                         .tabItem {
