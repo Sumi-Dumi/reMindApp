@@ -25,6 +25,7 @@ struct Avatar: Codable, Identifiable {
     var created_at: Timestamp?
     var updated_at: Timestamp?
     var deepfake_video_urls: [String]
+    var deep_fake_video_url_ghibli: [String]
     
     init(
         id: String = UUID().uuidString,
@@ -45,7 +46,8 @@ struct Avatar: Codable, Identifiable {
         status: String = "not_ready",
         created_at: Timestamp? = nil,
         updated_at: Timestamp? = nil,
-        deepfake_video_urls: [String] = []
+        deepfake_video_urls: [String] = [],
+        deep_fake_video_url_ghibli: [String] = []
     ) {
         self.id = id
         self.name = name
@@ -66,6 +68,7 @@ struct Avatar: Codable, Identifiable {
         self.created_at = created_at
         self.updated_at = updated_at
         self.deepfake_video_urls = deepfake_video_urls
+        self.deep_fake_video_url_ghibli = deep_fake_video_url_ghibli
     }
 }
 
