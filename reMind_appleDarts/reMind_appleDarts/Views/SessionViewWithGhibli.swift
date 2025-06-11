@@ -89,17 +89,30 @@ struct SessionView2: View {
         "Now, Tell me 1 thing you can TASTE?"
     ]
     
-    // デフォルト動画URL（テーマが特定できない場合）
+
     private var defaultVideoURL: String {
         return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
     }
     
-    // アイドリング動画URL（共通）
+
     private var idlingVideoURL: String {
-        return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+        guard let avatar = avatar else {
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+        }
+        
+        switch avatar.theme.lowercased() {
+        case "human":
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+            
+        case "ghibli":
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749609944/Ghibli_idle_oabbhn.mp4"
+            
+        default:
+            print("⚠️ Unknown theme '\(avatar.theme)', using default idling video")
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+        }
     }
 
-    // テーマに応じた動画URL配列を取得
     private var videoURLsForCurrentTheme: [String] {
         guard let avatar = avatar else {
             print("⚠️ No avatar data available, using default video")
@@ -117,8 +130,6 @@ struct SessionView2: View {
             }
             
         case "ghibli":
-            // deep_fake_video_url_ghibliプロパティが存在するかチェック
-            // 注意: Avatarモデルにdeep_fake_video_url_ghibliプロパティを追加する必要があります
             if let ghibliVideos = getGhibliVideos(from: avatar), !ghibliVideos.isEmpty {
                 print("🎬 Using Ghibli theme videos: \(ghibliVideos.count) videos")
                 return ghibliVideos
@@ -133,13 +144,11 @@ struct SessionView2: View {
         }
     }
     
-    // Ghibli動画URLを取得するヘルパーメソッド
     private func getGhibliVideos(from avatar: Avatar) -> [String]? {
-        // deep_fake_video_url_ghibliプロパティが存在し、空でない場合に返す
         return avatar.deep_fake_video_url_ghibli.isEmpty ? nil : avatar.deep_fake_video_url_ghibli
     }
 
-    // 現在表示すべき動画URLを取得
+
     private var currentVideoURL: String {
         if isPressing {
             return idlingVideoURL
