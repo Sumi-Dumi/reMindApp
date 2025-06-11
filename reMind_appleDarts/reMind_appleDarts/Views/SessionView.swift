@@ -165,7 +165,7 @@ struct SessionView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                VideoView(videoURL: currentVideoURL)
+                VideoView(videoURL: currentVideoURL, shouldAutoPlay: !recorded)
                     .ignoresSafeArea()
                     .id("video_\(currentStep)_\(isPressing)_\(recorded)_\(avatar?.theme ?? "default")")
                 LinearGradient(
@@ -263,6 +263,7 @@ struct SessionView: View {
                                 },
                                 onPressEnd: {
                                     print("🎬 Mic released: Pausing video")
+                                    recorded = true
                                 },
                                 onPressingChanged: { pressing in
                                     isPressing = pressing

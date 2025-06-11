@@ -32,15 +32,17 @@ struct CustomVideoPlayerView: UIViewControllerRepresentable {
 
 struct VideoView: View {
     let videoURL: String
+    let shouldAutoPlay: Bool  // ← 新しく追加
     @State var player: AVPlayer?
     @State private var isLoading = true
     @State private var hasError = false
     @State private var cancellables = Set<AnyCancellable>()
     @State private var overlayOpacity: Double = 0.0
 
-
-    init(videoURL: String = "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4") {
+    // 修正されたイニシャライザー
+    init(videoURL: String = "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4", shouldAutoPlay: Bool = true) {
         self.videoURL = videoURL
+        self.shouldAutoPlay = shouldAutoPlay  // ← 新しく追加
     }
 
     var body: some View {
@@ -55,12 +57,10 @@ struct VideoView: View {
             }
             
             Color.black
-                            .opacity(overlayOpacity)
-                            .edgesIgnoringSafeArea(.all)
-                            .animation(.easeInOut(duration: 0.6), value: overlayOpacity)
+                .opacity(overlayOpacity)
+                .edgesIgnoringSafeArea(.all)
+                .animation(.easeInOut(duration: 0.6), value: overlayOpacity)
 
-
-            
             if isLoading {
                 ProgressView()
                     .scaleEffect(1.5)
@@ -101,19 +101,26 @@ struct VideoView: View {
             cleanupPlayer()
             loadVideo()
         }
-
+        .onChange(of: shouldAutoPlay) { autoPlay in  // ← 新しく追加
+            print("🎬 shouldAutoPlay changed to: \(autoPlay)")
+            if autoPlay {
+                player?.play()
+            } else {
+                player?.pause()
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
             player?.pause()
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            if !isLoading && !hasError {
+            if !isLoading && !hasError && shouldAutoPlay {  // ← shouldAutoPlayを確認
                 player?.play()
             }
         }
     }
     
     private func loadVideo() {
-        print("🎬 Loading video: \(videoURL)")
+        print("🎬 Loading video: \(videoURL), shouldAutoPlay: \(shouldAutoPlay)")
         
         guard let url = URL(string: videoURL) else {
             print("❌ Invalid video URL: \(videoURL)")
@@ -125,21 +132,23 @@ struct VideoView: View {
         isLoading = true
         hasError = false
         cancellables.removeAll()
-        
 
         let newPlayer = AVPlayer(url: url)
         self.player = newPlayer
-        
 
         newPlayer.publisher(for: \.status)
             .receive(on: DispatchQueue.main)
             .sink { status in
                 switch status {
                 case .readyToPlay:
-                    print("✅ Video ready to play")
+                    print("✅ Video ready to play, shouldAutoPlay: \(shouldAutoPlay)")
                     isLoading = false
                     hasError = false
-                    newPlayer.play()
+                    
+                    // shouldAutoPlayに基づいて再生制御
+                    if shouldAutoPlay {
+                        newPlayer.play()
+                    }
                     
                     NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: newPlayer.currentItem)
                         .receive(on: DispatchQueue.main)
@@ -162,8 +171,6 @@ struct VideoView: View {
                 }
             }
             .store(in: &cancellables)
-        
-        
 
         NotificationCenter.default.publisher(for: .AVPlayerItemFailedToPlayToEndTime, object: newPlayer.currentItem)
             .receive(on: DispatchQueue.main)
@@ -196,5 +203,5 @@ struct VideoView: View {
 }
 
 #Preview {
-    VideoView(videoURL: "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4")
+    VideoView(videoURL: "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4", shouldAutoPlay: false)
 }
