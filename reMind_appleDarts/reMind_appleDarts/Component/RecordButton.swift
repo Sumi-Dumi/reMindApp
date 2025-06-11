@@ -12,6 +12,20 @@ struct RecordButton: View {
     /// Tracks whether the user has just released (recording is done).
 //    @State private var recorded: Bool = false
     @Binding var recorded: Bool
+    
+    
+    let onPressStart: (() -> Void)?
+    let onPressEnd: (() -> Void)?
+    let onPressingChanged: ((Bool) -> Void)?
+    init(recorded: Binding<Bool>,
+         onPressStart: (() -> Void)? = nil,
+         onPressEnd: (() -> Void)? = nil,
+         onPressingChanged: ((Bool) -> Void)? = nil) {
+        self._recorded = recorded
+        self.onPressStart = onPressStart
+        self.onPressEnd = onPressEnd
+        self.onPressingChanged = onPressingChanged
+    }
 
     var body: some View {
         ZStack {
@@ -105,17 +119,22 @@ struct RecordButton: View {
         .contentShape(Circle()) // Make the entire 100×100 tappable
         .frame(width: 100, height: 100)
         // Attach a LongPressGesture(minimumDuration: 0) for immediate press detection:
-        .onLongPressGesture(minimumDuration: 1,
+        .onLongPressGesture(minimumDuration: 0,
                             pressing: { inProgress in
-            // This closure runs as soon as the finger touches down (inProgress = true),
-            // and again when the finger lifts (inProgress = false).
             withAnimation(.easeInOut(duration: 0.1)) {
                 isPressing = inProgress
+                
+
+                onPressingChanged?(inProgress)
+                
+                if inProgress {
+                    onPressStart?()
+                } else {
+                    recorded = true
+                    onPressEnd?()
+                }
             }
         }) {
-            // This “perform” block only runs ONCE when the long press completes (finger lifts).
-            // Mark “recorded = true” to switch to the gradient‐stroke circle.
-            recorded = true
         }
     }
 }
