@@ -43,7 +43,7 @@ struct MainTabView: View {
                             Text("Profile")
                         }
 
-                    ContentView()
+                    TutorialView()
                         .environmentObject(appViewModel)
                         .tag(4)
                         .tabItem {
