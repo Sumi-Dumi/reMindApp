@@ -169,7 +169,8 @@ struct RequestConsentView: View {
             "status": "not_ready",
             "created_at": Timestamp(date: Date()),
             "updated_at": Timestamp(date: Date()),
-            "deepfake_video_urls": []
+            "deepfake_video_urls": [],
+            "deep_fake_video_url_ghibli": []
         ]
     }
     
