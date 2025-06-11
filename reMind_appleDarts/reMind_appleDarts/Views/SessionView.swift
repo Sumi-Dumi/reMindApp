@@ -1,5 +1,6 @@
 import SwiftUI
 import AVKit
+import Combine
 
 struct TagView: View {
     let tags: [String]
@@ -61,6 +62,7 @@ struct SessionView: View {
     @State private var tags: [String] = []
     @State private var isShowingIdlingVideo: Bool = false
     @State private var isPressing: Bool = false
+    @StateObject private var keyboard = KeyboardResponder()
 
     init(avatar: Avatar? = nil) {
         self.avatar = avatar
@@ -220,8 +222,9 @@ struct SessionView: View {
                         
                     }
 
-                    Spacer()
+//                    Spacer()
                 }
+                .padding(.bottom, max(keyboard.currentHeight - 20, 0))
                 .frame(maxHeight: .infinity, alignment: .top)
 
                 if isKeyboardMode {
@@ -368,6 +371,26 @@ struct SessionView: View {
                 print("⚠️ SessionView started without avatar data, using default video")
             }
         }
+    }
+}
+
+
+
+final class KeyboardResponder: ObservableObject {
+    @Published var currentHeight: CGFloat = 0
+    private var cancellables = Set<AnyCancellable>()
+   
+    init() {
+        let willShow = NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
+            .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect }
+            .map { $0.height }
+     
+        let willHide = NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)
+            .map { _ in CGFloat(0) }
+     
+        Publishers.Merge(willShow, willHide)
+            .assign(to: \.currentHeight, on: self)
+            .store(in: &cancellables)
     }
 }
 
