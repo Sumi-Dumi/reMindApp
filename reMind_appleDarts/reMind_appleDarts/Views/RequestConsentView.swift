@@ -151,7 +151,8 @@ struct RequestConsentView: View {
     ) -> [String: Any] {
         return [
             "id": avatarId,
-            "name": recipientName, //             "isDefault": false,
+            "name": recipientName,
+            "isDefault": false,
             "language": "English",
             "theme": "Human",
             "voiceTone": "Gentle",
