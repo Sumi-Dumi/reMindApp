@@ -60,7 +60,7 @@ struct MainView_Firebase: View {
                             ) {
                                 Text("Add more +")
                                     .font(.caption)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.primaryText)
                             }
                             
                             // Refresh button
@@ -68,9 +68,12 @@ struct MainView_Firebase: View {
                                 firebaseAvatarManager.refresh()
                             }) {
                                 Image(systemName: "arrow.clockwise")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.white)
                                     .font(.caption)
+                                    .padding(6)
+                                    .background(Circle().fill(Color.secondaryGreen))
                             }
+
                         }
                     }
                     .padding(.horizontal, 16)
