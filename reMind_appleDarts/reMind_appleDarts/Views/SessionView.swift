@@ -212,26 +212,28 @@ struct SessionView: View {
                                     .clipShape(Circle())
                                     .padding(.leading, 20)
                             }
-
+                            
                             Spacer()
-
+                            
                             if recorded || (!tags.isEmpty) || currentStep == 0 || currentStep == 3{
                                 HStack(spacing: 30) {
-                                    Button(action: {
-                                        recorded = false
-                                        inputText = ""
-                                        tags.removeAll() 
-                                    }) {
-                                        Image(systemName: "xmark")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 12, height: 12)
-                                            .padding(10)
-                                            .background(Color.black.opacity(0.3))
-                                            .clipShape(Circle())
-                                            .foregroundColor(.white)
+                                    if currentStep != 0 && currentStep != 3 && (recorded || !tags.isEmpty) {
+                                        Button(action: {
+                                            recorded = false
+                                            inputText = ""
+                                            tags.removeAll()
+                                        }) {
+                                            Image(systemName: "xmark")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 12, height: 12)
+                                                .padding(10)
+                                                .background(Color.black.opacity(0.3))
+                                                .clipShape(Circle())
+                                                .foregroundColor(.white)
+                                        }
                                     }
-
+                                    
                                     Button(action: {
                                         if currentStep < prompts.count - 1 {
                                             currentStep += 1
@@ -253,9 +255,12 @@ struct SessionView: View {
                                             .clipShape(Circle())
                                     }
                                 }
+                                
+                                
+                                
+                                
+                                
                             }
-
-
                         }
                         .padding(.horizontal, 30)
                     }
