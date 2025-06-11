@@ -51,6 +51,7 @@ struct MainTabView: View {
                             Text("Help")
                         }
                 }
+                .tint(Color.secondaryGreen)
 
                 // Overlay: white background with padding effect
                 VStack(spacing: 0) {
