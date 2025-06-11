@@ -1,25 +1,5 @@
 import SwiftUI
 import AVKit
-import Combine
-
-final class KeyboardResponder: ObservableObject {
-    @Published var currentHeight: CGFloat = 0
-    private var cancellables = Set<AnyCancellable>()
-    
-    init() {
-        let willShow = NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
-            .compactMap { $0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect }
-            .map { $0.height }
-        
-        let willHide = NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)
-            .map { _ in CGFloat(0) }
-        
-        Publishers.Merge(willShow, willHide)
-            .assign(to: \.currentHeight, on: self)
-            .store(in: &cancellables)
-    }
-}
-
 
 struct TagView: View {
     let tags: [String]
@@ -81,7 +61,6 @@ struct SessionView: View {
     @State private var tags: [String] = []
     @State private var isShowingIdlingVideo: Bool = false
     @State private var isPressing: Bool = false
-    @StateObject private var keyboard = KeyboardResponder()
 
     init(avatar: Avatar? = nil) {
         self.avatar = avatar
@@ -110,20 +89,76 @@ struct SessionView: View {
         "Now, Tell me 1 thing you can TASTE?"
     ]
     
-    private var idlingVideoURL: String {
-        return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+
+    private var defaultVideoURL: String {
+        return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
     }
+    
+
+    private var idlingVideoURL: String {
+        guard let avatar = avatar else {
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+        }
+        
+        switch avatar.theme.lowercased() {
+        case "human":
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+            
+        case "ghibli":
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749609944/Ghibli_idle_oabbhn.mp4"
+            
+        default:
+            print("⚠️ Unknown theme '\(avatar.theme)', using default idling video")
+            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+        }
+    }
+
+    private var videoURLsForCurrentTheme: [String] {
+        guard let avatar = avatar else {
+            print("⚠️ No avatar data available, using default video")
+            return [defaultVideoURL]
+        }
+        
+        switch avatar.theme.lowercased() {
+        case "human":
+            if !avatar.deepfake_video_urls.isEmpty {
+                print("🎬 Using Human theme videos: \(avatar.deepfake_video_urls.count) videos")
+                return avatar.deepfake_video_urls
+            } else {
+                print("⚠️ No Human theme videos available, using default")
+                return [defaultVideoURL]
+            }
+            
+        case "ghibli":
+            if let ghibliVideos = getGhibliVideos(from: avatar), !ghibliVideos.isEmpty {
+                print("🎬 Using Ghibli theme videos: \(ghibliVideos.count) videos")
+                return ghibliVideos
+            } else {
+                print("⚠️ No Ghibli theme videos available, falling back to Human videos")
+                return avatar.deepfake_video_urls.isEmpty ? [defaultVideoURL] : avatar.deepfake_video_urls
+            }
+            
+        default:
+            print("⚠️ Unknown theme '\(avatar.theme)', using default videos")
+            return avatar.deepfake_video_urls.isEmpty ? [defaultVideoURL] : avatar.deepfake_video_urls
+        }
+    }
+    
+    private func getGhibliVideos(from avatar: Avatar) -> [String]? {
+        return avatar.deep_fake_video_url_ghibli.isEmpty ? nil : avatar.deep_fake_video_url_ghibli
+    }
+
 
     private var currentVideoURL: String {
         if isPressing {
             return idlingVideoURL
         } else {
-            guard let avatar = avatar,
-                  !avatar.deepfake_video_urls.isEmpty else {
-                return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
-            }
-            let videoIndex = min(currentStep, avatar.deepfake_video_urls.count - 1)
-            return avatar.deepfake_video_urls[videoIndex]
+            let videos = videoURLsForCurrentTheme
+            let videoIndex = min(currentStep, videos.count - 1)
+            let selectedURL = videos[videoIndex]
+            
+            print("🎬 Current step: \(currentStep), Theme: \(avatar?.theme ?? "unknown"), Video: \(selectedURL)")
+            return selectedURL
         }
     }
 
@@ -132,7 +167,7 @@ struct SessionView: View {
             ZStack {
                 VideoView(videoURL: currentVideoURL)
                     .ignoresSafeArea()
-                    .id("video_\(currentStep)_\(isPressing)_\(recorded)")
+                    .id("video_\(currentStep)_\(isPressing)_\(recorded)_\(avatar?.theme ?? "default")")
                 LinearGradient(
                     gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
                     startPoint: .top,
@@ -185,9 +220,8 @@ struct SessionView: View {
                         
                     }
 
-//                    Spacer()
+                    Spacer()
                 }
-                .padding(.bottom, max(keyboard.currentHeight - 20, 0))
                 .frame(maxHeight: .infinity, alignment: .top)
 
                 if isKeyboardMode {
@@ -288,7 +322,10 @@ struct SessionView: View {
                                             recorded = false
                                             inputText = ""
                                             tags.removeAll()
-                                            print("🎬 Step \(currentStep): Playing video[\(min(currentStep, avatar?.deepfake_video_urls.count ?? 1) - 1)] = \(currentVideoURL)")
+                                            
+                                            let videos = videoURLsForCurrentTheme
+                                            let videoIndex = min(currentStep, videos.count - 1)
+                                            print("🎬 Step \(currentStep): Theme \(avatar?.theme ?? "unknown"), Playing video[\(videoIndex)] = \(videos[videoIndex])")
                                         } else {
                                             navigateToBreak = true
                                         }
@@ -307,6 +344,7 @@ struct SessionView: View {
                         }
                         .padding(.horizontal, 30)
                     }
+                    .padding(.bottom, 24)
                 }
                 
 
@@ -320,7 +358,10 @@ struct SessionView: View {
         .onAppear {
             if let avatar = avatar {
                 print("✅ SessionView started with avatar: \(avatar.name)")
-                print("📹 Available video URLs (\(avatar.deepfake_video_urls.count)): \(avatar.deepfake_video_urls)")
+                print("🎨 Avatar theme: \(avatar.theme)")
+                
+                let videos = videoURLsForCurrentTheme
+                print("📹 Available videos for theme '\(avatar.theme)' (\(videos.count)): \(videos)")
                 print("🎬 Starting with video: \(currentVideoURL)")
             } else {
                 print("⚠️ SessionView started without avatar data, using default video")
@@ -331,12 +372,12 @@ struct SessionView: View {
 
 struct SessionView_Previews: PreviewProvider {
     static var previews: some View {
-        let sampleAvatar = Avatar(
-            id: "sample_avatar",
-            name: "Sample Avatar",
+        let sampleHumanAvatar = Avatar(
+            id: "sample_avatar_human",
+            name: "Human Avatar",
             isDefault: true,
             language: "English",
-            theme: "Calm",
+            theme: "Human",
             voiceTone: "Gentle",
             profileImg: "sample_avatar",
             deepfakeReady: true,
@@ -361,6 +402,46 @@ struct SessionView_Previews: PreviewProvider {
             ]
         )
         
-        SessionView(avatar: sampleAvatar)
+        let sampleGhibliAvatar = Avatar(
+            id: "sample_avatar_ghibli",
+            name: "Ghibli Avatar",
+            isDefault: false,
+            language: "Japanese",
+            theme: "Ghibli",
+            voiceTone: "Gentle",
+            profileImg: "sample_avatar",
+            deepfakeReady: true,
+            recipient_name: "User",
+            creator_name: "Sample",
+            image_urls: [],
+            audio_url: "",
+            image_count: 0,
+            audio_size_mb: "0",
+            storage_provider: "cloudinary",
+            status: "ready",
+            created_at: nil,
+            updated_at: nil,
+            deepfake_video_urls: [
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294443/Grandma_It_s_Alright_tgrunw.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
+            ],
+            deep_fake_video_url_ghibli: [
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605094/Ghibli_pumpkin_kpihrr.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605093/Ghibli_part_1_pmdxjt.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605093/Ghibli_part_2_mwckxf.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605092/Ghibli_Its_Alright_sdlbym.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605094/Ghibli_part_3_irthug.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605093/Ghibli_part_4_oewuyw.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749605728/Ghibli_Part_5_ol2te0.mp4"
+            ]
+        )
+        
+        Group {
+            SessionView(avatar: sampleHumanAvatar)
+                .previewDisplayName("Human Theme")
+            
+            SessionView(avatar: sampleGhibliAvatar)
+                .previewDisplayName("Ghibli Theme")
+        }
     }
 }
