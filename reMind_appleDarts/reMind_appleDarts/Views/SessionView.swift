@@ -59,6 +59,8 @@ struct SessionView: View {
     @State private var isKeyboardMode: Bool = false
     @State private var inputText: String = ""
     @State private var tags: [String] = []
+    @State private var isShowingIdlingVideo: Bool = false
+    @State private var isPressing: Bool = false
 
     init(avatar: Avatar? = nil) {
         self.avatar = avatar
@@ -87,15 +89,21 @@ struct SessionView: View {
         "Now, Tell me 1 thing you can TASTE?"
     ]
     
+    private var idlingVideoURL: String {
+        return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294445/Grandma_Idle_ixptkp.mp4"
+    }
+
     private var currentVideoURL: String {
-        guard let avatar = avatar,
-              !avatar.deepfake_video_urls.isEmpty else {
-            // デフォルトの動画URL
-            return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
+        if isPressing {
+            return idlingVideoURL
+        } else {
+            guard let avatar = avatar,
+                  !avatar.deepfake_video_urls.isEmpty else {
+                return "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
+            }
+            let videoIndex = min(currentStep, avatar.deepfake_video_urls.count - 1)
+            return avatar.deepfake_video_urls[videoIndex]
         }
-        
-        let videoIndex = min(currentStep, avatar.deepfake_video_urls.count - 1)
-        return avatar.deepfake_video_urls[videoIndex]
     }
 
     var body: some View {
@@ -103,7 +111,7 @@ struct SessionView: View {
             ZStack {
                 VideoView(videoURL: currentVideoURL)
                     .ignoresSafeArea()
-                    .id("video_\(currentStep)") //
+                    .id("video_\(currentStep)_\(isPressing)_\(recorded)")
                 LinearGradient(
                     gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.2)]),
                     startPoint: .top,
@@ -192,13 +200,30 @@ struct SessionView: View {
                                     .cornerRadius(100)
                             }
                         } else {
-                            RecordButton(recorded: $recorded)
+                            RecordButton(
+                                recorded: $recorded,
+                                onPressStart: {
+                                    print("🎬 Mic press started")
+                                },
+                                onPressEnd: {
+                                    print("🎬 Mic released: Pausing video")
+                                },
+                                onPressingChanged: { pressing in
+                                    isPressing = pressing
+                                    if pressing {
+                                        print("🎬 Pressing: Switching to idling video")
+                                    } else {
+                                        print("🎬 Not pressing: Back to normal video")
+                                    }
+                                }
+                            )
                         }
 
                         HStack {
                             Button(action: {
                                 isKeyboardMode.toggle()
                                 recorded = false
+                                isPressing = false
                                 inputText = ""
                                 tags.removeAll()
                             }) {
@@ -212,11 +237,12 @@ struct SessionView: View {
                                     .clipShape(Circle())
                                     .padding(.leading, 20)
                             }
-                            
+
                             Spacer()
-                            
-                            if recorded || (!tags.isEmpty) || currentStep == 0 || currentStep == 3{
+
+                            if recorded || (!tags.isEmpty) || currentStep == 0 || currentStep == 3 {
                                 HStack(spacing: 30) {
+
                                     if currentStep != 0 && currentStep != 3 && (recorded || !tags.isEmpty) {
                                         Button(action: {
                                             recorded = false
@@ -233,7 +259,7 @@ struct SessionView: View {
                                                 .foregroundColor(.white)
                                         }
                                     }
-                                    
+
                                     Button(action: {
                                         if currentStep < prompts.count - 1 {
                                             currentStep += 1
@@ -255,11 +281,6 @@ struct SessionView: View {
                                             .clipShape(Circle())
                                     }
                                 }
-                                
-                                
-                                
-                                
-                                
                             }
                         }
                         .padding(.horizontal, 30)
@@ -279,9 +300,9 @@ struct SessionView: View {
             if let avatar = avatar {
                 print("✅ SessionView started with avatar: \(avatar.name)")
                 print("📹 Available video URLs (\(avatar.deepfake_video_urls.count)): \(avatar.deepfake_video_urls)")
-                print("Starting with video: \(currentVideoURL)")
+                print("🎬 Starting with video: \(currentVideoURL)")
             } else {
-                print("SessionView started without avatar data, using default video")
+                print("⚠️ SessionView started without avatar data, using default video")
             }
         }
     }
