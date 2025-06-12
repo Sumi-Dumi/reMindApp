@@ -90,6 +90,26 @@ struct SessionView: View {
         "Focus on 2 things you can SMELL?",
         "Now, Tell me 1 thing you can TASTE?"
     ]
+    let prompts_jap = [
+        "愛しのあなた、私はここにいるよ",
+        "さて、あなたの周りに見える５つのものは？",
+        "いま、触れている４つのものは？",
+        "本当に素晴らしいです!",
+        "少し聞いて、あなたが聞こえる３つの音はなんですか？",
+        "ゆっくり吸って、２つの香りを感じますか？",
+        "少し時間をとって、今あなたが感じている１つの味を教えて？"
+    ]
+    
+
+    private var currentPrompts: [String] {
+        guard let avatar = avatar else { return prompts }
+        
+        if avatar.language.lowercased() == "japanese" {
+            return prompts_jap
+        } else {
+            return prompts
+        }
+    }
     
 
     private var defaultVideoURL: String {
@@ -132,18 +152,37 @@ struct SessionView: View {
             }
             
         case "ghibli":
-            if let ghibliVideos = getGhibliVideos(from: avatar), !ghibliVideos.isEmpty {
-                print("🎬 Using Ghibli theme videos: \(ghibliVideos.count) videos")
-                return ghibliVideos
+            if avatar.language.lowercased() == "japanese" {
+                if let japaneseGhibliVideos = getJapaneseGhibliVideos(from: avatar), !japaneseGhibliVideos.isEmpty {
+                    print("🎬 Using Ghibli Japanese theme videos: \(japaneseGhibliVideos.count) videos")
+                    return japaneseGhibliVideos
+                } else {
+                    print("⚠️ No Ghibli Japanese videos available, falling back to regular Ghibli videos")
+                    if let ghibliVideos = getGhibliVideos(from: avatar), !ghibliVideos.isEmpty {
+                        return ghibliVideos
+                    }
+                }
             } else {
-                print("⚠️ No Ghibli theme videos available, falling back to Human videos")
-                return avatar.deepfake_video_urls.isEmpty ? [defaultVideoURL] : avatar.deepfake_video_urls
+                if let ghibliVideos = getGhibliVideos(from: avatar), !ghibliVideos.isEmpty {
+                    print("🎬 Using Ghibli theme videos: \(ghibliVideos.count) videos")
+                    return ghibliVideos
+                } else {
+                    print("⚠️ No Ghibli theme videos available, falling back to Human videos")
+                }
             }
+            
+            return avatar.deepfake_video_urls.isEmpty ? [defaultVideoURL] : avatar.deepfake_video_urls
             
         default:
             print("⚠️ Unknown theme '\(avatar.theme)', using default videos")
             return avatar.deepfake_video_urls.isEmpty ? [defaultVideoURL] : avatar.deepfake_video_urls
         }
+    }
+    
+
+    private func getJapaneseGhibliVideos(from avatar: Avatar) -> [String]? {
+
+        return avatar.deep_fake_video_url_ghibli_jap.isEmpty ? nil : avatar.deep_fake_video_url_ghibli_jap
     }
     
     private func getGhibliVideos(from avatar: Avatar) -> [String]? {
@@ -195,7 +234,7 @@ struct SessionView: View {
                 VStack(spacing: 16) {
                     Spacer().frame(height: isKeyboardMode ? 400 : 500)
 
-                    Text(prompts[currentStep])
+                    Text(currentPrompts[currentStep])
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.vertical, 12)
@@ -460,12 +499,50 @@ struct SessionView_Previews: PreviewProvider {
             ]
         )
         
+        let sampleGhibliJapAvatar = Avatar(
+            id: "sample_avatar_ghibli_jap",
+            name: "Ghibli Avatar",
+            isDefault: false,
+            language: "Japanese",
+            theme: "Ghibli",
+            voiceTone: "Gentle",
+            profileImg: "sample_avatar",
+            deepfakeReady: true,
+            recipient_name: "User",
+            creator_name: "Sample",
+            image_urls: [],
+            audio_url: "",
+            image_count: 0,
+            audio_size_mb: "0",
+            storage_provider: "cloudinary",
+            status: "ready",
+            created_at: nil,
+            updated_at: nil,
+            deepfake_video_urls: [
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294443/Grandma_It_s_Alright_tgrunw.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749294446/Grandma_part_1_ouhhqp.mp4"
+            ],
+            deep_fake_video_url_ghibli: [
+            ],
+            deep_fake_video_url_ghibli_jap: [
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749686985/Ghibli_Jap_pumpkin_hr6vve.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749686985/Ghibli_Japanese_part_1_z7ohu7.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749686985/Ghibli_Japanese_part_2_lsg9s3.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749686985/Ghibli_Japanese_doing_really_great_ikmfth.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749686985/Ghibli_Japanese_part_3_gszydf.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749686985/Ghibli_Japanese_part_4_epkv2q.mp4",
+                "https://res.cloudinary.com/dvyjkf3xq/video/upload/v1749687210/Ghibli_Jap_Part_5_bap526.mp4"
+            ]
+        )
+        
         Group {
             SessionView(avatar: sampleHumanAvatar)
                 .previewDisplayName("Human Theme")
             
             SessionView(avatar: sampleGhibliAvatar)
                 .previewDisplayName("Ghibli Theme")
+            SessionView(avatar: sampleGhibliJapAvatar)
+                .previewDisplayName("Ghibli Jap Theme")
         }
     }
 }

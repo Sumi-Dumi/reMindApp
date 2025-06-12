@@ -35,17 +35,16 @@ struct EnhancedAvatarCard: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                             } placeholder: {
-                                Image("sample_avatar")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
+                                Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 28, weight: .medium))
                             }
                             .frame(width: 68, height: 72)
                             .clipShape(Circle())
                         } else {
-                            Image("sample_avatar")
-                                .resizable()
-                                .frame(width: 68, height: 72)
-                                .clipShape(Circle())
+                            Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                                .foregroundColor(.white)
+                                .font(.system(size: 28, weight: .medium))
                         }
                         
                         // Text content

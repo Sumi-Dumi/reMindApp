@@ -142,7 +142,7 @@ struct RequestConsentView: View {
         }
     }
     
-    // MARK: - Avatar Data Creation（必要なフィールドのみ）
+    // MARK: - Avatar Data Creation
     private func createAvatarData(
         avatarId: String,
         recipientName: String,
@@ -170,7 +170,8 @@ struct RequestConsentView: View {
             "created_at": Timestamp(date: Date()),
             "updated_at": Timestamp(date: Date()),
             "deepfake_video_urls": [],
-            "deep_fake_video_url_ghibli": []
+            "deep_fake_video_url_ghibli": [],
+            "deep_fake_video_url_ghibli_jap": []
         ]
     }
     
